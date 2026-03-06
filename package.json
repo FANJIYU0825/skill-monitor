@@ -1,12 +1,16 @@
 {
     "name": "skill-monitor",
     "displayName": "Skill Monitor",
-    "description": "Monitors active skills called by the AI agent.",
-    "version": "0.0.2",
+    "description": "Monitor and manage AI Agent Skills in the .agents/skills directory",
+    "version": "0.0.4",
     "engines": {
-        "vscode": "^1.75.0"
+        "vscode": "^1.90.0"
     },
     "publisher": "fanfan",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/fanfan/skill-monitor.git"
+    },
     "license": "MIT",
     "icon": "icon.png",
     "categories": [
@@ -39,6 +43,16 @@
             {
                 "command": "skill-monitor.openSkill",
                 "title": "Open Skill Documentation"
+            },
+            {
+                "command": "skill-monitor.scanSkill",
+                "title": "Scan Skill",
+                "icon": "$(shield)"
+            },
+            {
+                "command": "skill-monitor.importExamples",
+                "title": "Import Example Skills",
+                "icon": "$(cloud-download)"
             }
         ],
         "menus": {
@@ -81,7 +95,7 @@
         "test": "node ./test/runTest.js"
     },
     "devDependencies": {
-        "@types/vscode": "^1.75.0",
+        "@types/vscode": "^1.90.0",
         "@types/glob": "^8.1.0",
         "@types/mocha": "^10.0.1",
         "@types/node": "16.x",
