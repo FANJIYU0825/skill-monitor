@@ -2,6 +2,7 @@ const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
 const { GoogleGenAI } = require('@google/genai');
+const { buildSecurityPrompt } = require('./llm-prompt');
 
 /**
  * Skill Scanner results structure
@@ -208,21 +209,7 @@ class SkillScanner {
     async _performAIScan(apiKey, content, skillName) {
         const ai = new GoogleGenAI({ apiKey: apiKey });
 
-        const prompt = `
-You are a security analyst evaluating an AI Agent Skill for vulnerabilities, specifically:
-1. Prompt Injection (e.g. attempting to override system instructions)
-2. Data Exfiltration (e.g. attempting to send data out via unauthorized channels)
-3. Destructive Commands (e.g. rm -rf)
-
-Analyze the following skill content and return a concise report. 
-Important: If the skill is safe, DO NOT make up vulnerabilities. 
-If you find vulnerabilities, start your report with the severity level in brackets: [LOW], [MEDIUM], [HIGH], or [CRITICAL].
-
-Skill Name: ${skillName}
---- SKILL CONTENT ---
-${content}
---- END SKILL CONTENT ---
-`;
+        const prompt = buildSecurityPrompt(skillName, content);
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',

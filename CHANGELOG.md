@@ -2,6 +2,10 @@
 
 All notable changes to the Skill Monitor extension will be documented in this file.
 
+## [0.0.9] - 2026-03-07
+### Security
+- **Smart Scanner LLM Upgrade**: Extracted and upgraded the Gemini LLM Prompt into `src/llm-prompt.js`. It now uses unpredictable randomized delimiters (e.g. `<!---UNTRUSTED_INPUT_START_...`) and explicitly enforces the Cisco AITech Threat Taxonomy to prevent Prompt Injection during the AI analysis phase itself.
+
 ## [0.0.8] - 2026-03-07
 
 ### Changed
