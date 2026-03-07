@@ -2,7 +2,7 @@
 
 🌍 [English](README_EN.md) | **繁體中文**
 
-[![Version: 0.0.5](https://img.shields.io/badge/Version-0.0.5-blue.svg?style=for-the-badge)](https://github.com/FANJIYU0825/skill-monitor)
+[![Version: 0.0.6](https://img.shields.io/badge/Version-0.0.6-blue.svg?style=for-the-badge)](https://github.com/FANJIYU0825/skill-monitor)
 [![GitHub stars](https://img.shields.io/github/stars/FANJIYU0825/skill-monitor?style=for-the-badge&color=ffd700)](https://github.com/FANJIYU0825/skill-monitor/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/FANJIYU0825/skill-monitor?style=for-the-badge&color=red)](https://github.com/FANJIYU0825/skill-monitor/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
