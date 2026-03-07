@@ -15,4 +15,5 @@ CHANGELOG.md
 vsc-extension-quickstart.md
 publish_guide.md
 *.vsix
+skill-scanner/
 .DS_Store
