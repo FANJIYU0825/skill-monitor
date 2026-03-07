@@ -11,8 +11,8 @@ This skill helps AI Agents and developers automatically release the VS Code exte
 1.  **Version Bump**: Make sure the `version` in `package.json` is updated and changes are committed.
 2.  **GitHub CLI (`gh`)**: Ensure you are logged into the GitHub CLI. (You can check by running `gh auth status`).
 3.  **Open VSX Access Token**: You need a Personal Access Token from [open-vsx.org](https://open-vsx.org/).
-    *   Set it as an environment variable in your terminal: `export OVSX_PAT="your_token_here"`
-    *   Or have it ready to paste when prompted.
+    *   Store your raw Open VSX token inside the `.env` file in the root of the project.
+    *   The Agent will automatically read this `.env` file to retrieve the token for publishing.
 
 ---
 
@@ -38,11 +38,14 @@ gh release create <version> --title "Release v<version>" --notes-file CHANGELOG.
 ### Step 3: Publish to Open VSX Registry
 Use the `ovsx` cli wrapper (via `npx` to avoid global installs) to publish the `.vsix` file to the Open VSX marketplace.
 
+First, read the token from the `.env` file, then pass it to the publish command.
+
 ```bash
+# Read the token from .env and publish
 # Example: replace <version> with 0.0.7
+export OVSX_PAT=$(cat .env)
 npx ovsx publish ./skill-monitor-<version>.vsix -p $OVSX_PAT
 ```
-*(Note: If `$OVSX_PAT` is not set in the environment, you will need to ask the user to provide it directly in the command: `-p <TOKEN>`)*
 
 ---
 
