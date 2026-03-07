@@ -2,14 +2,14 @@
     "name": "skill-monitor",
     "displayName": "Skill Monitor",
     "description": "Monitor and manage AI Agent Skills in the .agents/skills directory",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "engines": {
         "vscode": "^1.90.0"
     },
     "publisher": "fanfan",
     "repository": {
         "type": "git",
-        "url": "https://github.com/fanfan/skill-monitor.git"
+        "url": "https://github.com/FANJIYU0825/skill-monitor.git"
     },
     "license": "MIT",
     "icon": "icon.png",
