@@ -25,10 +25,12 @@ An advanced skill monitoring dashboard designed for AI Agent developers. This ex
     - **Double Click**: Manually activates or deactivates the skill.
 - **Apply Command**: Click "Apply" to copy the skill's slash command (e.g. `/pdf`) directly to your clipboard, allowing you to easily paste it into chat interfaces to invoke the skill.
 - **📦 Import Examples**: Click `+ Import Examples` from the dashboard to easily import built-in demo skills directly into your project's `.agents/skills` directory.
-- **🛡️ Smart Security Scanner (Skill Scanner)**: *(Latest Update: AI scanning deactivated)*
+- **🛡️ Smart Security Scanner (Skill Scanner)**: *(Latest Update: Regular Expressions + Google Gemini)*
     - Click "Scan" to perform a structural and security check on a specific skill.
     - **Structural Validation**: Verifies YAML Frontmatter strictly.
-    - **Security Analysis (Regular Expressions)**: Automatically analyzes `SKILL.md` using robust **Regular Expressions** and heuristic logic to detect Prompt Injection, data exfiltration risks, or dangerous system commands. (Note: The OpenAI API AI scan method has been removed for better stability).
+    - **Dual Security Analysis**:
+      1. **Regular Expressions (Re Rep)**: Automatic analysis using robust pattern matching to detect Prompt Injection, data exfiltration risks, or dangerous system commands.
+      2. **AI Analysis (LLM Rep)**: Deep semantic security analysis using the `Google Gemini` API to find hidden vulnerabilities.
     - **Intuitive Report**: Displays scan results, severity, and errors inside an overlay dashboard directly.
 - **Global Monitoring Switch**: The dashboard syncs with the VS Code Status Bar, supporting a one-click toggle for monitoring states (ON / OFF).
 
@@ -62,6 +64,14 @@ Example of the `active_skill.json` format:
     "active_skills": ["pdf", "skill-creator"]
 }
 ```
+
+### 🧠 Setup Google Gemini API (Enable AI Scanning)
+1. Ensure you have a [Google Gemini API Key](https://aistudio.google.com/app/apikey).
+2. Press `Cmd + Shift + P` in VS Code to open the Command Palette.
+3. Search for and execute the command: `Test Google Generative AI`.
+4. Paste your Google API Key into the prompt.
+5. **Security Notice**: This key is securely stored in your local VS Code Global Settings (`skill-monitor.googleApiKey`). It is **exempt from cloud synchronization** (`ignoreSync: true`) and will NEVER be committed or tracked by Git with your project. Your key remains private.
+6. Once configured, click the "Scan" button in your dashboard to view dual scan results via `Re Rep` and `LLM Rep`!
 
 ## 📜 License
 MIT License

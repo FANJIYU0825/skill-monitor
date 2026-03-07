@@ -25,10 +25,12 @@
     - **雙擊**：手動啟動 (Activate) 或關閉 (Deactivate) 該技能。
 - **Apply (進階功能)**：點擊 "Apply" 按鈕，自動複製該技能的 Slash Command（例如 `/pdf`）到剪貼簿，方便您直接貼到聊天工作區調用技能。
 - **📦 引入範例技能 (Import Examples)**：在儀表板點擊 `+ Import Examples`，即可一鍵將擴充功能內建的展示用 (Demo) 技能範本直接匯入到您目前專案的 `.agents/skills` 目錄中，無需手動建立資料夾與文件。
-- **🛡️ 智能安全掃描 (Skill Scanner)**：*(最新更新：關閉 AI 掃描)*
+- **🛡️ 智能安全掃描 (Skill Scanner)**：*(最新更新：結合 RegExp 與 Google Gemini)*
     - 點擊 "Scan" 可對特定技能進行結構與安全檢查。
     - **結構驗證**：檢查 YAML Frontmatter 格式以及 Markdown 核心段落是否完整。
-    - **安全分析 (正則表達式)**：自動分析 `SKILL.md` 內容，使用**正則表達式 (Regular Expressions)** 與啟發式規則偵測是否有 Prompt Injection、惡意外洩風險或系統破壞指令，並給予危險等級提示。（註：為求穩定性，目前已關閉並移除依賴 OpenAI API 的掃描方式。）
+    - **雙重安全掃描**：
+      1. **正則表示法 (Re Rep)**：基本啟發式驗證，包含 Prompt Injection 與各種破壞指令。
+      2. **AI 分析 (LLM Rep)**：透過 `Google Gemini` 進行更深度的語意安全分析與弱點偵測。
     - **直觀的分析報告**：在儀表板覆蓋層 (Overlay) 即時顯示掃描結果、嚴重等級與潛在錯誤。
 - **全局監控開關**：儀表板與狀態欄（Status Bar）同步，支援一鍵切換監控狀態 (Monitor ON / OFF)。
 
@@ -62,6 +64,14 @@
     "active_skills": ["pdf", "skill-creator"]
 }
 ```
+
+### 🧠 設定 Google Gemini API (啟用 AI 掃描)
+1. 確保您擁有一個 [Google Gemini API Key](https://aistudio.google.com/app/apikey)。
+2. 在 VS Code 中按下 `Cmd + Shift + P` 開啟命令面板。
+3. 搜尋並執行指令：`Test Google Generative AI`。
+4. 在彈出的輸入框中，貼上您的 Google API Key。
+5. **安全性說明**：這把金鑰將會安全地儲存在您本地電腦的 VS Code 全域設定中 (`skill-monitor.googleApiKey`)，且已設定成**不會跟隨雲端同步** (`ignoreSync: true`)，也不會與您的原始碼一起被 Git 追蹤上傳。所以您的 Key 不會外洩。
+6. 設定完成後，回到 Dashboard 點擊 "Scan"，即可看到 `Re Rep` 與 `LLM Rep` 的雙重掃描結果！
 
 ## 📜 授權
 MIT License
