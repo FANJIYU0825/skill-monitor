@@ -1,6 +1,7 @@
 const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
+const { GoogleGenAI } = require('@google/genai');
 const { SkillScanner } = require('./scanner');
 const { SkillMonitorWebviewProvider } = require('./webviewProvider');
 
@@ -147,6 +148,60 @@ function activate(context) {
         } else {
             vscode.window.showErrorMessage(`SKILL.md not found for example skill '${skillName}'.`);
         }
+    });
+
+    // Interaction: Test Google Generative AI
+    vscode.commands.registerCommand('skill-monitor.testGoogleAI', async () => {
+        // Read the API key from VS Code settings (we will ask user to set it if empty)
+        const config = vscode.workspace.getConfiguration('skill-monitor');
+        let apiKey = config.get('googleApiKey');
+
+        if (!apiKey) {
+            apiKey = await vscode.window.showInputBox({
+                prompt: 'Please enter your Google Gemini API Key',
+                password: true,
+                ignoreFocusOut: true
+            });
+
+            if (!apiKey) {
+                vscode.window.showWarningMessage('Google API Key is required to test Gemini.');
+                return;
+            }
+
+            // Save the key to global settings
+            await config.update('googleApiKey', apiKey, vscode.ConfigurationTarget.Global);
+            vscode.window.showInformationMessage('Google API Key saved successfully.');
+        }
+
+        vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `Testing Google Gemini...`,
+            cancellable: false
+        }, async () => {
+            try {
+                // Initialize the SDK
+                const ai = new GoogleGenAI({ apiKey: apiKey });
+
+                // Call the API
+                const response = await ai.models.generateContent({
+                    model: 'gemini-2.5-flash',
+                    contents: 'Explain semantic versioning in one short sentence.',
+                });
+
+                vscode.window.showInformationMessage("Gemini says: " + response.text);
+
+            } catch (error) {
+                console.error("Google AI test failed:", error);
+
+                // If it's an API key error, we can clear the saved key
+                if (error.message && error.message.includes('API key')) {
+                    await config.update('googleApiKey', undefined, vscode.ConfigurationTarget.Global);
+                    vscode.window.showErrorMessage(`Authentication failed. The saved API key has been cleared. Full error: ${error.message}`);
+                } else {
+                    vscode.window.showErrorMessage(`Google AI Test failed: ${error.message}`);
+                }
+            }
+        });
     });
 
     // File Watchers

@@ -53,6 +53,11 @@
                 "command": "skill-monitor.importExamples",
                 "title": "Import Example Skills",
                 "icon": "$(cloud-download)"
+            },
+            {
+                "command": "skill-monitor.testGoogleAI",
+                "title": "Test Google Generative AI",
+                "icon": "$(sparkle)"
             }
         ],
         "menus": {
@@ -87,6 +92,17 @@
                     "icon": "$(zap)"
                 }
             ]
+        },
+        "configuration": {
+            "title": "Skill Monitor",
+            "properties": {
+                "skill-monitor.googleApiKey": {
+                    "type": "string",
+                    "default": "",
+                    "description": "API Key for Google Generative AI (Gemini). Used for AI features.",
+                    "ignoreSync": true
+                }
+            }
         }
     },
     "scripts": {
@@ -95,14 +111,17 @@
         "test": "node ./test/runTest.js"
     },
     "devDependencies": {
-        "@types/vscode": "^1.90.0",
         "@types/glob": "^8.1.0",
         "@types/mocha": "^10.0.1",
         "@types/node": "16.x",
+        "@types/vscode": "^1.90.0",
+        "@vscode/test-electron": "^2.3.0",
         "eslint": "^8.36.0",
         "glob": "^8.1.0",
         "mocha": "^10.2.0",
-        "typescript": "^4.9.5",
-        "@vscode/test-electron": "^2.3.0"
+        "typescript": "^4.9.5"
+    },
+    "dependencies": {
+        "@google/genai": "^1.44.0"
     }
 }
