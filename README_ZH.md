@@ -1,11 +1,11 @@
-# Skill Monitor VS Code Extension
+# Skill Monitor (技能儀表板)
 
 🌍 [English](README.md) | **繁體中文**
 
-[![Version: 0.0.8](https://img.shields.io/badge/Version-0.0.8-blue.svg?style=for-the-badge)](https://github.com/FANJIYU0825/skill-monitor)
+![Version](https://img.shields.io/badge/version-0.1.1-blue.svg)
 [![GitHub stars](https://img.shields.io/github/stars/FANJIYU0825/skill-monitor?style=for-the-badge&color=ffd700)](https://github.com/FANJIYU0825/skill-monitor/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/FANJIYU0825/skill-monitor?style=for-the-badge&color=red)](https://github.com/FANJIYU0825/skill-monitor/issues)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 > **⚠️ 重要專案網址聲明**  
 > 由於 **Namespace (命名空間) 問題**，本專案的正確官方 Repository 位置為：  
@@ -28,9 +28,9 @@
 - **🛡️ 智能安全掃描 (Skill Scanner)**：*(整合 [Cisco AI Defense Skill-Scanner](https://github.com/cisco-ai-defense/skill-scanner/) 規則與 Google Gemini)*
     - 點擊 "Scan" 可對特定技能進行結構與安全檢查。
     - **結構驗證**：檢查 YAML Frontmatter 格式以及 Markdown 核心段落是否完整。
-    - **雙重安全掃描**：
-      1. **正則表示法 (Re Rep)**：參考 **Cisco AITech Threat Taxonomy** 框架進行的高速啟發式驗證，瞬間攔截 Prompt Injection (`AITech-1.1`)、Data Exfiltration (`AITech-4`) 與危險系統指令 (`AITech-2`)。
-      2. **AI 分析 (LLM Rep)**：透過 `Google Gemini` 進行更深度的語意安全分析與弱點偵測。
+    - **平行安全掃描 (Parallel Analysis)**：並行調派多個分析引擎，達到幾乎零延遲的掃描速度：
+      1. **正則表示法 (Re Rep)**：涵蓋完整的 **Cisco AITech Threat Taxonomy** 框架 (`AITech-1.1`, `1.2`, `4.3`, `8.2`, `9.1`, `9.2`, `12.1`)，瞬間攔截 Prompt Injection、Data Exfiltration、危險系統指令與混淆程式碼。
+      2. **AI 分析 (LLM Rep)**：透過 `Google Gemini` 進行更深度的語意安全分析與弱點偵測，並採用隨機分隔符號防禦 LLM 注入攻擊。
     - **直觀的分析報告**：在儀表板覆蓋層 (Overlay) 即時顯示掃描結果、嚴重等級與潛在錯誤。
 - **全局監控開關**：儀表板與狀態欄（Status Bar）同步，支援一鍵切換監控狀態 (Monitor ON / OFF)。
 

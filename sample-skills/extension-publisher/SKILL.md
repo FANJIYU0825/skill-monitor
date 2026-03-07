@@ -25,7 +25,7 @@ First, build the `.vsix` packaging file using `vsce`.
 ```bash
 vsce package
 ```
-*Take note of the generated `.vsix` filename (e.g., `skill-monitor-0.0.7.vsix`).*
+*Take note of the generated `.vsix` filename (e.g., `skill-monitor-`).*
 
 ### Step 2: Create a GitHub Release
 Use the GitHub CLI to create a release, using `CHANGELOG.md` for the release notes, and attach the `.vsix` file.

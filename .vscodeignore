@@ -17,3 +17,6 @@ publish_guide.md
 *.vsix
 skill-scanner/
 .DS_Store
+.gitignore
+.gitattributes
+.env
