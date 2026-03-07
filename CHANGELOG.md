@@ -2,6 +2,15 @@
 
 All notable changes to the Skill Monitor extension will be documented in this file.
 
+## [0.0.6] - 2026-03-07
+
+### Added
+- Added Language Switch (English / Traditional Chinese) to README.
+- Included Sample Skills Demo Folder and detailed explanation documentation (`sample-skills/README.md`).
+
+### Changed
+- Fixed `package.json` repository URL to point to the correct `FANJIYU0825` namespace to resolve Open VSX registry loading issues.
+
 ## [0.0.5] - 2026-03-07
 
 ### Changed
