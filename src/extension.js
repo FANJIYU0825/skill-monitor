@@ -47,7 +47,7 @@ function activate(context) {
     // Interaction: Open Skill Documentation
     vscode.commands.registerCommand('skill-monitor.openSkill', (skillName) => {
         const workspaceFolders = vscode.workspace.workspaceFolders;
-        if (!workspaceFolders) return;
+        if (!workspaceFolders || workspaceFolders.length === 0) return;
 
         const rootPath = workspaceFolders[0].uri.fsPath;
         const skillMdPath = path.join(rootPath, '.agents', 'skills', skillName, 'SKILL.md');
@@ -64,7 +64,7 @@ function activate(context) {
     // Interaction: Scan Skill using Unified SkillScanner
     vscode.commands.registerCommand('skill-monitor.scanSkill', async (skillName) => {
         const workspaceFolders = vscode.workspace.workspaceFolders;
-        if (!workspaceFolders) {
+        if (!workspaceFolders || workspaceFolders.length === 0) {
             vscode.window.showErrorMessage('No active workspace folder.');
             return;
         }
@@ -113,7 +113,7 @@ function activate(context) {
     vscode.commands.registerCommand('skill-monitor.importExamples', async (skillName) => {
         if (!skillName || typeof skillName !== 'string') return;
         const workspaceFolders = vscode.workspace.workspaceFolders;
-        if (!workspaceFolders) {
+        if (!workspaceFolders || workspaceFolders.length === 0) {
             vscode.window.showErrorMessage('No active workspace folder to import into.');
             return;
         }
@@ -206,7 +206,7 @@ function activate(context) {
 
     // File Watchers
     const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (workspaceFolders) {
+    if (workspaceFolders && workspaceFolders.length > 0) {
         const rootPath = workspaceFolders[0].uri.fsPath;
 
         const watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(rootPath, '.agents/active_skill.json'));
@@ -242,7 +242,7 @@ function updateStatusBarItem() {
         return;
     }
     const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (!workspaceFolders) {
+    if (!workspaceFolders || workspaceFolders.length === 0) {
         myStatusBarItem.text = `$(gear) Skill: None`;
         return;
     }

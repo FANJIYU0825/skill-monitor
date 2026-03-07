@@ -70,7 +70,7 @@ class SkillMonitorWebviewProvider {
 
         const isMonitoring = this._getIsMonitoring();
         const workspaceFolders = vscode.workspace.workspaceFolders;
-        if (!workspaceFolders) {
+        if (!workspaceFolders || workspaceFolders.length === 0) {
             this._view.webview.postMessage({ type: 'update', isMonitoring, activeSkills: [], availableSkills: [] });
             return;
         }
@@ -166,7 +166,7 @@ class SkillMonitorWebviewProvider {
 
     async _toggleSkillActivation(skillName) {
         const workspaceFolders = vscode.workspace.workspaceFolders;
-        if (!workspaceFolders) return;
+        if (!workspaceFolders || workspaceFolders.length === 0) return;
         const rootPath = workspaceFolders[0].uri.fsPath;
         const activeSkillPath = path.join(rootPath, '.agents', 'active_skill.json');
 

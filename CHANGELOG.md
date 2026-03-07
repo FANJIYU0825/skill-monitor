@@ -2,8 +2,11 @@
 
 All notable changes to the Skill Monitor extension will be documented in this file.
 
+## [0.1.2]
+### Fixed
+- **Packaging Bug**: Removed `node_modules/**` from `.vscodeignore` so that runtime dependencies (like `@google/genai`) are correctly bundled into the VSIX file, resolving the `command 'skill-monitor.testGoogleAI' not found` issue.
+
 ## [0.1.1]
-### Changed
 - **Multi-Agent Orchestration**: Refactored the security scanner's AI analysis entirely using a multi-agent framework.
 - **Improved LLM Prompts**: Defined specialized subagent prompts (`PromptInjection`, `DataExfiltration`, `CommandInjection`, `ToolAbuse`) to increase detection precision based on the Cisco AITech taxonomy.
 - **Synthesis Agent**: Combined concurrent scanner results via a dedicated Synthesis Agent to reduce LLM hallucinations and organize findings.
