@@ -2,6 +2,12 @@
 
 All notable changes to the Skill Monitor extension will be documented in this file.
 
+## [0.0.5] - 2026-03-07
+
+### Changed
+- Clarified in README that the AI Security Scanner has been disabled.
+- Emphasized that the scanner now relies exclusively on robust Regular Expressions (正則表達式) and heuristic rules for security validation.
+
 ## [0.0.4] - 2026-03-07
 
 ### Added
