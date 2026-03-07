@@ -2,6 +2,16 @@
 
 All notable changes to the Skill Monitor extension will be documented in this file.
 
+## [0.0.7] - 2026-03-07
+
+### Added
+- Re-enabled and upgraded the AI Security Scanner using `Google Gemini`.
+- Integrated `Re Rep` (Regular Expression) and `LLM Rep` (AI Scanning) results directly into the UI.
+- Configurable `skill-monitor.googleApiKey` to enable AI scanning securely on the user's machines.
+
+### Changed
+- Swapped the default README documentation language to English in the Visual Studio Code extension marketplace.
+
 ## [0.0.6] - 2026-03-07
 
 ### Added
