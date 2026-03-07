@@ -53,11 +53,6 @@
                 "command": "skill-monitor.importExamples",
                 "title": "Import Example Skills",
                 "icon": "$(cloud-download)"
-            },
-            {
-                "command": "skill-monitor.setApiKey",
-                "title": "Set Scanner API Key",
-                "icon": "$(key)"
             }
         ],
         "menus": {
