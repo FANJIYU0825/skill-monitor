@@ -2,7 +2,7 @@
 
 🌍 **English** | [繁體中文](README_ZH.md)
 
-[![Version: 0.0.8](https://img.shields.io/badge/Version-0.0.8-blue.svg?style=for-the-badge)](https://github.com/FANJIYU0825/skill-monitor)
+[![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-blue.svg?style=for-the-badge)](https://github.com/FANJIYU0825/skill-monitor)
 [![GitHub stars](https://img.shields.io/github/stars/FANJIYU0825/skill-monitor?style=for-the-badge&color=ffd700)](https://github.com/FANJIYU0825/skill-monitor/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/FANJIYU0825/skill-monitor?style=for-the-badge&color=red)](https://github.com/FANJIYU0825/skill-monitor/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -28,9 +28,9 @@ An advanced skill monitoring dashboard designed for AI Agent developers. This ex
 - **🛡️ Smart Security Scanner (Skill Scanner)**: *(Features [Cisco AI Defense Skill-Scanner](https://github.com/cisco-ai-defense/skill-scanner/) rules + Google Gemini)*
     - Click "Scan" to perform a structural and security check on a specific skill.
     - **Structural Validation**: Verifies YAML Frontmatter strictly.
-    - **Dual Security Analysis**:
-      1. **Regular Expressions (Re Rep)**: High-speed heuristic analysis based on **Cisco AITech Threat Taxonomy** (`AITech-1.1` Prompt Injection, `AITech-4` Data Exfiltration, `AITech-2` Command Injection) for zero-latency detection.
-      2. **AI Analysis (LLM Rep)**: Deep semantic security analysis using the `Google Gemini` API to find hidden vulnerabilities.
+    - **Parallel Security Analysis**: Dispatches completely concurrent subagent APIs for zero-latency scanning:
+      1. **Regular Expressions (Re Rep)**: High-speed heuristic analysis based on **Cisco AITech Threat Taxonomy** (`AITech-1.1`, `AITech-1.2`, `AITech-4.3`, `AITech-8.2`, `AITech-9.1`, `AITech-9.2`, `AITech-12.1`) detecting Prompts Injection, Command Execution, Data Exfiltration, and Obfuscation.
+      2. **AI Analysis (LLM Rep)**: Deep semantic security analysis using the `Google Gemini` API to find hidden vulnerabilities with randomized delimiter protection.
     - **Intuitive Report**: Displays scan results, severity, and errors inside an overlay dashboard directly.
 - **Global Monitoring Switch**: The dashboard syncs with the VS Code Status Bar, supporting a one-click toggle for monitoring states (ON / OFF).
 

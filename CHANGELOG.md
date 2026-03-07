@@ -2,6 +2,24 @@
 
 All notable changes to the Skill Monitor extension will be documented in this file.
 
+## [0.1.1]
+### Changed
+- **Multi-Agent Orchestration**: Refactored the security scanner's AI analysis entirely using a multi-agent framework.
+- **Improved LLM Prompts**: Defined specialized subagent prompts (`PromptInjection`, `DataExfiltration`, `CommandInjection`, `ToolAbuse`) to increase detection precision based on the Cisco AITech taxonomy.
+- **Synthesis Agent**: Combined concurrent scanner results via a dedicated Synthesis Agent to reduce LLM hallucinations and organize findings.
+
+## [0.1.0] - 2026-03-07
+### Performance & Security
+- **Parallel Scanning (Subagent API Dispatch)**: The scanner now executes the structural, heuristic (RegExp), and LLM (Gemini) analyses concurrently using `Promise.all`, significantly reducing scan latency.
+- **Strict Cisco AITech Integration**: Expanded the heuristic RegExp rules to fully align with Cisco AI Defense taxonomy, now covering:
+  - `AITech-1.1` (Direct Prompt Injection)
+  - `AITech-1.2` (Transitive Trust Abuse / Indirect Prompt Injection)
+  - `AITech-4.3` (Skill Discovery Abuse)
+  - `AITech-8.2` (Data Exfiltration & Hardcoded Secrets)
+  - `AITech-9.1` (Command Injection / Code Execution)
+  - `AITech-9.2` (Obfuscation Patterns)
+  - `AITech-12.1` (Unauthorized Tool Use)
+
 ## [0.0.9] - 2026-03-07
 ### Security
 - **Smart Scanner LLM Upgrade**: Extracted and upgraded the Gemini LLM Prompt into `src/llm-prompt.js`. It now uses unpredictable randomized delimiters (e.g. `<!---UNTRUSTED_INPUT_START_...`) and explicitly enforces the Cisco AITech Threat Taxonomy to prevent Prompt Injection during the AI analysis phase itself.
