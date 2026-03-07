@@ -1,5 +1,15 @@
 # Skill Monitor VS Code Extension
 
+[![GitHub stars](https://img.shields.io/github/stars/FANJIYU0825/skill-monitor?style=for-the-badge&color=ffd700)](https://github.com/FANJIYU0825/skill-monitor/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/FANJIYU0825/skill-monitor?style=for-the-badge&color=red)](https://github.com/FANJIYU0825/skill-monitor/issues)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
+> **⚠️ 重要專案網址聲明**  
+> 由於 **Namespace (命名空間) 問題**，本專案的正確官方 Repository 位置為：  
+> 👉 **[https://github.com/FANJIYU0825/skill-monitor](https://github.com/FANJIYU0825/skill-monitor)**  
+> 
+> 如果您覺得這款套件對您的 AI 代理開發有幫助，**拜託點此網址去給我一顆星星 ⭐️！** 您的支持是我持續更新的動力 🙌！
+
 一個為 AI Agent 開發者設計的進階技能監控面板。本擴充功能可以即時追蹤當前啟用的技能（Skills），並提供直觀的視覺反饋與安全掃描功能。
 
 ## ✨ 特色功能
