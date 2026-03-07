@@ -43,6 +43,26 @@ function activate(context) {
         vscode.commands.executeCommand('setContext', 'skill-monitor:isMonitoring', isMonitoring);
     });
 
+    // API Key Configuration
+    vscode.commands.registerCommand('skill-monitor.setApiKey', async () => {
+        const apiKey = await vscode.window.showInputBox({
+            prompt: 'Enter your OpenAI API Key for Security Scanning',
+            password: true,
+            placeHolder: 'sk-...'
+        });
+
+        if (apiKey !== undefined) {
+            if (apiKey.trim() === '') {
+                await context.secrets.delete('openaiApiKey');
+                vscode.window.showInformationMessage('OpenAI API Key cleared.');
+            } else {
+                await context.secrets.store('openaiApiKey', apiKey.trim());
+                vscode.window.showInformationMessage('OpenAI API Key saved securely.');
+            }
+        }
+    });
+
+
     // Interaction: Open Skill Documentation
     vscode.commands.registerCommand('skill-monitor.openSkill', (skillName) => {
         const workspaceFolders = vscode.workspace.workspaceFolders;
@@ -79,7 +99,8 @@ function activate(context) {
             scannerOutputChannel.show(true);
 
             try {
-                const scanResult = await scanner.scan(skillName, rootPath);
+                const apiKey = await context.secrets.get('openaiApiKey');
+                const scanResult = await scanner.scan(skillName, rootPath, apiKey);
 
                 // Log to output channel
                 scannerOutputChannel.appendLine(`Severity: ${scanResult.severity}`);

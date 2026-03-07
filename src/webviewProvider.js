@@ -45,6 +45,9 @@ class SkillMonitorWebviewProvider {
                 case 'previewExampleSkill':
                     vscode.commands.executeCommand('skill-monitor.previewExampleSkill', data.skillName);
                     break;
+                case 'setApiKey':
+                    vscode.commands.executeCommand('skill-monitor.setApiKey');
+                    break;
             }
         });
 
@@ -411,7 +414,10 @@ class SkillMonitorWebviewProvider {
             <body>
                 <div class="header">
                     <div class="title">Skill Dashboard</div>
-                    <div id="toggle-btn" class="toggle-btn">MONITOR ON</div>
+                    <div style="display: flex; gap: 8px;">
+                        <div id="api-key-btn" class="toggle-btn" onclick="vscode.postMessage({type:'setApiKey'})">🔑 API Key</div>
+                        <div id="toggle-btn" class="toggle-btn">MONITOR ON</div>
+                    </div>
                 </div>
                 <div class="tabs">
                     <div class="tab active" id="tab-dashboard" onclick="switchTab('dashboard')">Dashboard</div>

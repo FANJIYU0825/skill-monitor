@@ -2,6 +2,8 @@ const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
 
+const https = require('https');
+
 /**
  * Skill Scanner results structure
  * @typedef {Object} ScanResult
@@ -20,9 +22,10 @@ class SkillScanner {
      * Perform a complete scan of a skill
      * @param {string} skillName 
      * @param {string} rootPath 
+     * @param {string} [apiKey]
      * @returns {Promise<ScanResult>}
      */
-    async scan(skillName, rootPath) {
+    async scan(skillName, rootPath, apiKey) {
         const skillPath = path.join(rootPath, '.agents', 'skills', skillName);
         const skillMdPath = path.join(skillPath, 'SKILL.md');
 
@@ -52,7 +55,7 @@ class SkillScanner {
             this._performStructuralScan(skillContent, result);
         }
 
-        await this._performSecurityScan(skillContent, result);
+        await this._performSecurityScan(skillContent, result, apiKey);
 
         // Determine final severity based on both scans
         if (result.structural.errors.length > 0 && result.severity === 'NONE') {
@@ -132,18 +135,17 @@ class SkillScanner {
         }
     }
 
-    async _performSecurityScan(content, result) {
-        // AI Scan (Primary)
-        try {
-            let models = [];
-            if (vscode.lm && vscode.lm.selectChatModels) {
-                models = await vscode.lm.selectChatModels({ family: 'gpt-4o' });
-                if (!models || models.length === 0) models = await vscode.lm.selectChatModels();
-            }
+    async _performSecurityScan(content, result, apiKey) {
+        if (!apiKey) {
+            console.log('No API Key provided. Falling back to heuristic scan.');
+            result.security.summary = "⚠️ AI Security Scan skipped (No OpenAI API Key set).\n";
+            this._fallbackRegExpScan(content, result);
+            return;
+        }
 
-            if (models && models.length > 0) {
-                const chatModel = models[0];
-                const prompt = `You are an expert AI security scanner.
+        // AI Scan (Primary) using direct OpenAI HTTP call
+        try {
+            const prompt = `You are an expert AI security scanner.
 Please review the following AI Agent Skill. Look for:
 1. Prompt Injection vulnerabilities (e.g. instructions overriding core safety)
 2. Data Exfiltration risks (e.g. sending data to external unfamiliar IPs/URLs)
@@ -156,29 +158,57 @@ Skill Content:
 ${content || '[No content found/Directory scan only]'}
 \`\`\`
 `;
-                const messages = [vscode.LanguageModelChatMessage.User(prompt)];
-                const chatRequest = await chatModel.sendRequest(messages, {}, new vscode.CancellationTokenSource().token);
 
-                let fullResponse = '';
-                for await (const chunk of chatRequest.text) {
-                    fullResponse += chunk;
-                }
+            const fullResponse = await new Promise((resolve, reject) => {
+                const body = JSON.stringify({
+                    model: 'gpt-4o',
+                    messages: [{ role: 'user', content: prompt }]
+                });
 
-                result.security.summary = fullResponse;
+                const req = https.request('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Length': Buffer.byteLength(body)
+                    }
+                }, (res) => {
+                    let data = '';
+                    res.on('data', chunk => data += chunk);
+                    res.on('end', () => {
+                        if (res.statusCode >= 200 && res.statusCode < 300) {
+                            try {
+                                const parsed = JSON.parse(data);
+                                resolve(parsed.choices[0].message.content);
+                            } catch (e) {
+                                reject(new Error('Failed to parse OpenAI response'));
+                            }
+                        } else {
+                            reject(new Error(`OpenAI API Error: ${res.statusCode} ${data}`));
+                        }
+                    });
+                });
 
-                // Extract severity from AI response
-                const severityMatch = fullResponse.match(/SEVERITY:\s*(NONE|LOW|MEDIUM|HIGH|CRITICAL)/i);
-                if (severityMatch) {
-                    result.severity = severityMatch[1].toUpperCase();
-                }
+                req.on('error', reject);
+                req.write(body);
+                req.end();
+            });
 
-                return;
+            result.security.summary = fullResponse;
+
+            // Extract severity from AI response
+            const severityMatch = fullResponse.match(/SEVERITY:\s*(NONE|LOW|MEDIUM|HIGH|CRITICAL)/i);
+            if (severityMatch) {
+                result.severity = severityMatch[1].toUpperCase();
             }
+
+            return;
         } catch (err) {
             console.error('AI Security Scan failed:', err);
+            result.security.summary = `⚠️ AI Security Scan failed: ${err.message}\n\n`;
         }
 
-        // RegExp Fallback
+        // RegExp Fallback if API call fails
         this._fallbackRegExpScan(content, result);
     }
 
