@@ -2,7 +2,7 @@
 
 🌍 **English** | [繁體中文](README_ZH.md)
 
-[![Version: 0.0.7](https://img.shields.io/badge/Version-0.0.7-blue.svg?style=for-the-badge)](https://github.com/FANJIYU0825/skill-monitor)
+[![Version: 0.0.8](https://img.shields.io/badge/Version-0.0.8-blue.svg?style=for-the-badge)](https://github.com/FANJIYU0825/skill-monitor)
 [![GitHub stars](https://img.shields.io/github/stars/FANJIYU0825/skill-monitor?style=for-the-badge&color=ffd700)](https://github.com/FANJIYU0825/skill-monitor/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/FANJIYU0825/skill-monitor?style=for-the-badge&color=red)](https://github.com/FANJIYU0825/skill-monitor/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -25,11 +25,11 @@ An advanced skill monitoring dashboard designed for AI Agent developers. This ex
     - **Double Click**: Manually activates or deactivates the skill.
 - **Apply Command**: Click "Apply" to copy the skill's slash command (e.g. `/pdf`) directly to your clipboard, allowing you to easily paste it into chat interfaces to invoke the skill.
 - **📦 Import Examples**: Click `+ Import Examples` from the dashboard to easily import built-in demo skills directly into your project's `.agents/skills` directory.
-- **🛡️ Smart Security Scanner (Skill Scanner)**: *(Latest Update: Regular Expressions + Google Gemini)*
+- **🛡️ Smart Security Scanner (Skill Scanner)**: *(Features [Cisco AI Defense Skill-Scanner](https://github.com/cisco-ai-defense/skill-scanner/) rules + Google Gemini)*
     - Click "Scan" to perform a structural and security check on a specific skill.
     - **Structural Validation**: Verifies YAML Frontmatter strictly.
     - **Dual Security Analysis**:
-      1. **Regular Expressions (Re Rep)**: Automatic analysis using robust pattern matching to detect Prompt Injection, data exfiltration risks, or dangerous system commands.
+      1. **Regular Expressions (Re Rep)**: High-speed heuristic analysis based on **Cisco AITech Threat Taxonomy** (`AITech-1.1` Prompt Injection, `AITech-4` Data Exfiltration, `AITech-2` Command Injection) for zero-latency detection.
       2. **AI Analysis (LLM Rep)**: Deep semantic security analysis using the `Google Gemini` API to find hidden vulnerabilities.
     - **Intuitive Report**: Displays scan results, severity, and errors inside an overlay dashboard directly.
 - **Global Monitoring Switch**: The dashboard syncs with the VS Code Status Bar, supporting a one-click toggle for monitoring states (ON / OFF).

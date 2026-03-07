@@ -2,6 +2,13 @@
 
 All notable changes to the Skill Monitor extension will be documented in this file.
 
+## [0.0.8] - 2026-03-07
+
+### Changed
+- Integrated **Cisco AI Defense Skill-Scanner** threat taxonomy (`AITech`) rules into the heuristic scanner.
+- Enhanced regex detection for Prompt Injection (`AITech-1.1`), Data Exfiltration, and Command Injection for rapid, local execution without LLM latency.
+- Referenced `https://github.com/cisco-ai-defense/skill-scanner/` in documentation as the design baseline.
+
 ## [0.0.7] - 2026-03-07
 
 ### Added

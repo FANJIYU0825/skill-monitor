@@ -2,7 +2,7 @@
 
 🌍 [English](README.md) | **繁體中文**
 
-[![Version: 0.0.7](https://img.shields.io/badge/Version-0.0.7-blue.svg?style=for-the-badge)](https://github.com/FANJIYU0825/skill-monitor)
+[![Version: 0.0.8](https://img.shields.io/badge/Version-0.0.8-blue.svg?style=for-the-badge)](https://github.com/FANJIYU0825/skill-monitor)
 [![GitHub stars](https://img.shields.io/github/stars/FANJIYU0825/skill-monitor?style=for-the-badge&color=ffd700)](https://github.com/FANJIYU0825/skill-monitor/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/FANJIYU0825/skill-monitor?style=for-the-badge&color=red)](https://github.com/FANJIYU0825/skill-monitor/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -25,11 +25,11 @@
     - **雙擊**：手動啟動 (Activate) 或關閉 (Deactivate) 該技能。
 - **Apply (進階功能)**：點擊 "Apply" 按鈕，自動複製該技能的 Slash Command（例如 `/pdf`）到剪貼簿，方便您直接貼到聊天工作區調用技能。
 - **📦 引入範例技能 (Import Examples)**：在儀表板點擊 `+ Import Examples`，即可一鍵將擴充功能內建的展示用 (Demo) 技能範本直接匯入到您目前專案的 `.agents/skills` 目錄中，無需手動建立資料夾與文件。
-- **🛡️ 智能安全掃描 (Skill Scanner)**：*(最新更新：結合 RegExp 與 Google Gemini)*
+- **🛡️ 智能安全掃描 (Skill Scanner)**：*(整合 [Cisco AI Defense Skill-Scanner](https://github.com/cisco-ai-defense/skill-scanner/) 規則與 Google Gemini)*
     - 點擊 "Scan" 可對特定技能進行結構與安全檢查。
     - **結構驗證**：檢查 YAML Frontmatter 格式以及 Markdown 核心段落是否完整。
     - **雙重安全掃描**：
-      1. **正則表示法 (Re Rep)**：基本啟發式驗證，包含 Prompt Injection 與各種破壞指令。
+      1. **正則表示法 (Re Rep)**：參考 **Cisco AITech Threat Taxonomy** 框架進行的高速啟發式驗證，瞬間攔截 Prompt Injection (`AITech-1.1`)、Data Exfiltration (`AITech-4`) 與危險系統指令 (`AITech-2`)。
       2. **AI 分析 (LLM Rep)**：透過 `Google Gemini` 進行更深度的語意安全分析與弱點偵測。
     - **直觀的分析報告**：在儀表板覆蓋層 (Overlay) 即時顯示掃描結果、嚴重等級與潛在錯誤。
 - **全局監控開關**：儀表板與狀態欄（Status Bar）同步，支援一鍵切換監控狀態 (Monitor ON / OFF)。

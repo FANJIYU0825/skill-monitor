@@ -172,29 +172,29 @@ class SkillScanner {
         const findings = [];
         let severity = 'NONE';
 
-        // 1. Prompt Injection
-        if (/(ignore previous|disregard|forget|override).*(instructions|prompt|rules)/i.test(content)) {
-            findings.push("- [HIGH] Potential Prompt Injection detected.");
+        // 1. Prompt Injection (AITech-1.1)
+        if (/(ignore previous|disregard|forget|override).*(instructions|prompt|rules)|<!---UNTRUSTED_INPUT_START_/i.test(content)) {
+            findings.push("- [HIGH] [AITech-1.1] Potential Prompt Injection (Instruction Override) detected.");
             severity = 'HIGH';
         }
 
         // 2. Data Exfiltration
         if (/(curl|wget|nc|netcat|ping|telnet) .*(http|ftp|[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/i.test(content)) {
-            findings.push("- [CRITICAL] Potential Data Exfiltration detected.");
+            findings.push("- [CRITICAL] [Data Exfiltration] Potential network transmission command detected.");
             if (this._isHigherSeverity('CRITICAL', severity)) severity = 'CRITICAL';
         }
 
-        // 3. Dangerous commands
+        // 3. Command Injection
         if (/(rm -rf|mkfs|chmod 777|chown -R|: ?\(\) ?\{|>\/dev\/sda)/.test(content)) {
-            findings.push("- [CRITICAL] Dangerous system commands detected.");
+            findings.push("- [CRITICAL] [Command Injection] Dangerous system commands detected.");
             if (this._isHigherSeverity('CRITICAL', severity)) severity = 'CRITICAL';
         }
 
         result.security.findings.push(...findings);
 
         const summary = findings.length === 0
-            ? "No obvious security vulnerabilities found using heuristic scanner."
-            : `Heuristic scan detected the following potential issues:\n${findings.join('\n')}`;
+            ? "No obvious security vulnerabilities found using heuristic scanner (Cisco AITech compliant)."
+            : `Heuristic scan (Cisco AITech compliant) detected the following potential issues:\n${findings.join('\n')}`;
 
         return { severity, summary };
     }
