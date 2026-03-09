@@ -2,6 +2,15 @@
 
 All notable changes to the Skill Monitor extension will be documented in this file.
 
+## [0.1.3]
+### Fixed
+- **Examples Tab on First Install**: Examples panel now loads correctly immediately after installing the extension, without requiring an IDE reload.
+- **Missing `exampleSkills` without Workspace**: Fixed early return in `_performUpdate` that omitted `exampleSkills` when no workspace folder was open, causing a silent render failure.
+
+### Improved
+- **`onDidChangeVisibility` Listener**: The webview now refreshes automatically whenever the panel becomes visible, ensuring data is always up to date.
+- **`retainContextWhenHidden: true`**: Webview context is preserved when switching between panels, preventing unnecessary recreation and data loss.
+
 ## [0.1.2]
 ### Fixed
 - **Packaging Bug**: Removed `node_modules/**` from `.vscodeignore` so that runtime dependencies (like `@google/genai`) are correctly bundled into the VSIX file, resolving the `command 'skill-monitor.testGoogleAI' not found` issue.
