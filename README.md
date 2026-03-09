@@ -2,7 +2,7 @@
 
 🌍 **English** | [繁體中文](README_ZH.md)
 
-[![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-blue.svg?style=for-the-badge)](https://github.com/FANJIYU0825/skill-monitor)
+[![Version: 0.1.3](https://img.shields.io/badge/Version-0.1.3-blue.svg?style=for-the-badge)](https://github.com/FANJIYU0825/skill-monitor)
 [![GitHub stars](https://img.shields.io/github/stars/FANJIYU0825/skill-monitor?style=for-the-badge&color=ffd700)](https://github.com/FANJIYU0825/skill-monitor/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/FANJIYU0825/skill-monitor?style=for-the-badge&color=red)](https://github.com/FANJIYU0825/skill-monitor/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -24,7 +24,7 @@ An advanced skill monitoring dashboard designed for AI Agent developers. This ex
     - **Single Click**: Instantly opens the corresponding `SKILL.md` document.
     - **Double Click**: Manually activates or deactivates the skill.
 - **Apply Command**: Click "Apply" to copy the skill's slash command (e.g. `/pdf`) directly to your clipboard, allowing you to easily paste it into chat interfaces to invoke the skill.
-- **📦 Import Examples**: Click `+ Import Examples` from the dashboard to easily import built-in demo skills directly into your project's `.agents/skills` directory.
+- **📦 Import Examples**: Click `+ Import Examples` from the dashboard to easily import built-in demo skills directly into your project's `.agents/skills` directory. Examples now load correctly on first install without requiring an IDE reload.
 - **🛡️ Smart Security Scanner (Skill Scanner)**: *(Features [Cisco AI Defense Skill-Scanner](https://github.com/cisco-ai-defense/skill-scanner/) rules + Google Gemini)*
     - Click "Scan" to perform a structural and security check on a specific skill.
     - **Structural Validation**: Verifies YAML Frontmatter strictly.
@@ -72,6 +72,20 @@ Example of the `active_skill.json` format:
 4. Paste your Google API Key into the prompt.
 5. **Security Notice**: This key is securely stored in your local VS Code Global Settings (`skill-monitor.googleApiKey`). It is **exempt from cloud synchronization** (`ignoreSync: true`) and will NEVER be committed or tracked by Git with your project. Your key remains private.
 6. Once configured, click the "Scan" button in your dashboard to view dual scan results via `Re Rep` and `LLM Rep`!
+
+## 📋 Changelog
+
+### v0.1.3
+- **Bug Fix**: Examples tab now loads correctly on first install without requiring an IDE reload.
+- **Improvement**: Added `onDidChangeVisibility` listener — the panel refreshes automatically whenever it becomes visible.
+- **Improvement**: Added `retainContextWhenHidden: true` to prevent webview from being destroyed when switching panels.
+- **Bug Fix**: Fixed missing `exampleSkills` in the response when no workspace is open.
+
+### v0.1.2
+- Removed `node_modules` from `.vscodeignore`, bumped version.
+
+### v0.1.1
+- Multi-agent architecture support.
 
 ## 📜 License
 MIT License

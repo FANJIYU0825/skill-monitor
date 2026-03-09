@@ -32,7 +32,9 @@ function activate(context) {
     // Register WebviewViewProvider
     const provider = new SkillMonitorWebviewProvider(context.extensionUri, () => isMonitoring);
     context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider('skillMonitorWebView', provider)
+        vscode.window.registerWebviewViewProvider('skillMonitorWebView', provider, {
+            webviewOptions: { retainContextWhenHidden: true }
+        })
     );
 
     // Toggle command
