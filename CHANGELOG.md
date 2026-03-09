@@ -2,6 +2,11 @@
 
 All notable changes to the Skill Monitor extension will be documented in this file.
 
+## [0.1.4]
+### Changed
+- **Publisher renamed** from `fanfan` to `FANJIYU0825` to match GitHub account for Open VSX namespace verification.
+- Extension ID is now `FANJIYU0825.skill-monitor`.
+
 ## [0.1.3]
 ### Fixed
 - **Examples Tab on First Install**: Examples panel now loads correctly immediately after installing the extension, without requiring an IDE reload.
