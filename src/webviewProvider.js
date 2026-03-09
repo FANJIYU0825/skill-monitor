@@ -19,6 +19,12 @@ class SkillMonitorWebviewProvider {
 
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
+        webviewView.onDidChangeVisibility(() => {
+            if (webviewView.visible) {
+                this.updateState();
+            }
+        });
+
         webviewView.webview.onDidReceiveMessage(data => {
             switch (data.type) {
                 case 'openSkill':
@@ -70,18 +76,20 @@ class SkillMonitorWebviewProvider {
 
         const isMonitoring = this._getIsMonitoring();
         const workspaceFolders = vscode.workspace.workspaceFolders;
+
+        let activeSkills = [];
+        let availableSkills = [];
+        let exampleSkills = [];
+
         if (!workspaceFolders || workspaceFolders.length === 0) {
-            this._view.webview.postMessage({ type: 'update', isMonitoring, activeSkills: [], availableSkills: [] });
+            this._readExampleSkills(exampleSkills);
+            this._view.webview.postMessage({ type: 'update', isMonitoring, activeSkills, availableSkills, exampleSkills });
             return;
         }
 
         const rootPath = workspaceFolders[0].uri.fsPath;
         const skillsDir = path.join(rootPath, '.agents', 'skills');
         const activeSkillPath = path.join(rootPath, '.agents', 'active_skill.json');
-
-        let activeSkills = [];
-        let availableSkills = [];
-        let exampleSkills = [];
 
         try {
             if (fs.existsSync(activeSkillPath)) {
@@ -122,6 +130,18 @@ class SkillMonitorWebviewProvider {
             console.error('Error reading skills directory:', e);
         }
 
+        this._readExampleSkills(exampleSkills);
+
+        this._view.webview.postMessage({
+            type: 'update',
+            isMonitoring,
+            activeSkills,
+            availableSkills,
+            exampleSkills
+        });
+    }
+
+    _readExampleSkills(exampleSkills) {
         try {
             const sampleSkillsDir = path.join(this._extensionUri.fsPath, 'sample-skills');
             if (fs.existsSync(sampleSkillsDir)) {
@@ -154,14 +174,6 @@ class SkillMonitorWebviewProvider {
         } catch (e) {
             console.error('Error reading sample skills directory:', e);
         }
-
-        this._view.webview.postMessage({
-            type: 'update',
-            isMonitoring,
-            activeSkills,
-            availableSkills,
-            exampleSkills
-        });
     }
 
     async _toggleSkillActivation(skillName) {

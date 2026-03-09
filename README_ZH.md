@@ -2,7 +2,7 @@
 
 🌍 [English](README.md) | **繁體中文**
 
-![Version](https://img.shields.io/badge/version-0.1.2-blue.svg)
+![Version](https://img.shields.io/badge/version-0.1.3-blue.svg)
 [![GitHub stars](https://img.shields.io/github/stars/FANJIYU0825/skill-monitor?style=for-the-badge&color=ffd700)](https://github.com/FANJIYU0825/skill-monitor/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/FANJIYU0825/skill-monitor?style=for-the-badge&color=red)](https://github.com/FANJIYU0825/skill-monitor/issues)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
@@ -24,7 +24,7 @@
     - **單擊**：立即開啟對應技能的 `SKILL.md` 文件。
     - **雙擊**：手動啟動 (Activate) 或關閉 (Deactivate) 該技能。
 - **Apply (進階功能)**：點擊 "Apply" 按鈕，自動複製該技能的 Slash Command（例如 `/pdf`）到剪貼簿，方便您直接貼到聊天工作區調用技能。
-- **📦 引入範例技能 (Import Examples)**：在儀表板點擊 `+ Import Examples`，即可一鍵將擴充功能內建的展示用 (Demo) 技能範本直接匯入到您目前專案的 `.agents/skills` 目錄中，無需手動建立資料夾與文件。
+- **📦 引入範例技能 (Import Examples)**：在儀表板點擊 `+ Import Examples`，即可一鍵將擴充功能內建的展示用 (Demo) 技能範本直接匯入到您目前專案的 `.agents/skills` 目錄中，無需手動建立資料夾與文件。現已修復首次安裝時 Examples 不顯示的問題，無需重新載入 IDE。
 - **🛡️ 智能安全掃描 (Skill Scanner)**：*(整合 [Cisco AI Defense Skill-Scanner](https://github.com/cisco-ai-defense/skill-scanner/) 規則與 Google Gemini)*
     - 點擊 "Scan" 可對特定技能進行結構與安全檢查。
     - **結構驗證**：檢查 YAML Frontmatter 格式以及 Markdown 核心段落是否完整。
@@ -72,6 +72,20 @@
 4. 在彈出的輸入框中，貼上您的 Google API Key。
 5. **安全性說明**：這把金鑰將會安全地儲存在您本地電腦的 VS Code 全域設定中 (`skill-monitor.googleApiKey`)，且已設定成**不會跟隨雲端同步** (`ignoreSync: true`)，也不會與您的原始碼一起被 Git 追蹤上傳。所以您的 Key 不會外洩。
 6. 設定完成後，回到 Dashboard 點擊 "Scan"，即可看到 `Re Rep` 與 `LLM Rep` 的雙重掃描結果！
+
+## 📋 更新紀錄
+
+### v0.1.3
+- **Bug 修復**：首次安裝後 Examples 頁籤現在可以正確載入，不再需要重新載入 IDE。
+- **改善**：新增 `onDidChangeVisibility` 監聽器，切換到面板時自動重新整理資料。
+- **改善**：加入 `retainContextWhenHidden: true`，切換面板時不再銷毀 webview 上下文。
+- **Bug 修復**：修復未開啟 Workspace 時 `exampleSkills` 資料遺失的問題。
+
+### v0.1.2
+- 從 `.vscodeignore` 移除 `node_modules`，版本更新。
+
+### v0.1.1
+- 支援多代理人架構。
 
 ## 📜 授權
 MIT License
