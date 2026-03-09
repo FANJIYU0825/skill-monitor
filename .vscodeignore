@@ -10,7 +10,6 @@ brain/**
 implementation_plan.md
 task.md
 walkthrough.md
-CHANGELOG.md
 vsc-extension-quickstart.md
 publish_guide.md
 *.vsix
