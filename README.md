@@ -1,50 +1,95 @@
-# Skill Monitor VS Code Extension
+# Skill Monitor — VS Code Extension
 
 🌍 **English** | [繁體中文](README_ZH.md)
 
-[![Version: 0.1.4](https://img.shields.io/badge/Version-0.1.4-blue.svg?style=for-the-badge)](https://github.com/FANJIYU0825/skill-monitor)
+[![Version](https://img.shields.io/badge/Version-0.1.4-blue.svg?style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=FANJIYU0825.skill-monitor)
 [![GitHub stars](https://img.shields.io/github/stars/FANJIYU0825/skill-monitor?style=for-the-badge&color=ffd700)](https://github.com/FANJIYU0825/skill-monitor/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/FANJIYU0825/skill-monitor?style=for-the-badge&color=red)](https://github.com/FANJIYU0825/skill-monitor/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-> **⚠️ Important Origin Notice**  
-> Due to **Namespace issues**, the correct official repository for this project is:  
-> 👉 **[https://github.com/FANJIYU0825/skill-monitor](https://github.com/FANJIYU0825/skill-monitor)**  
-> 
-> If you find this extension helpful for your AI agent development, **please click the link and leave a Star ⭐️!** Your support is my motivation to keep updating 🙌!
+> If this extension helps your AI agent development, please ⭐️ the repo — it keeps the project going!
+> 👉 **[https://github.com/FANJIYU0825/skill-monitor](https://github.com/FANJIYU0825/skill-monitor)**
 
-An advanced skill monitoring dashboard designed for AI Agent developers. This extension tracks active skills in real-time, providing an intuitive visual interface and security scanning features.
+An advanced skill monitoring dashboard for AI Agent developers. Track active skills in real-time with a glassmorphism UI, one-click command injection, and a dual-engine security scanner.
+
+---
 
 ## ✨ Features
 
-- **Premium UI Dashboard**: A Glassmorphism style webview interface offering a clear list of skills.
-- **Dynamic Glow Status Bar**: When a skill is `ACTIVE`, the status bar glows with neon highlights.
-- **Real-Time Synchronization**: Automatically watches changes in `.agents/active_skill.json` and `.agents/skills/*` without manual refreshing.
-- **Efficient Interaction**:
-    - **Single Click**: Instantly opens the corresponding `SKILL.md` document.
-    - **Double Click**: Manually activates or deactivates the skill.
-- **Apply Command**: Click "Apply" to copy the skill's slash command (e.g. `/pdf`) directly to your clipboard, allowing you to easily paste it into chat interfaces to invoke the skill.
-- **📦 Import Examples**: Click `+ Import Examples` from the dashboard to easily import built-in demo skills directly into your project's `.agents/skills` directory. Examples now load correctly on first install without requiring an IDE reload.
-- **🛡️ Smart Security Scanner (Skill Scanner)**: *(Features [Cisco AI Defense Skill-Scanner](https://github.com/cisco-ai-defense/skill-scanner/) rules + Google Gemini)*
-    - Click "Scan" to perform a structural and security check on a specific skill.
-    - **Structural Validation**: Verifies YAML Frontmatter strictly.
-    - **Parallel Security Analysis**: Dispatches completely concurrent subagent APIs for zero-latency scanning:
-      1. **Regular Expressions (Re Rep)**: High-speed heuristic analysis based on **Cisco AITech Threat Taxonomy** (`AITech-1.1`, `AITech-1.2`, `AITech-4.3`, `AITech-8.2`, `AITech-9.1`, `AITech-9.2`, `AITech-12.1`) detecting Prompts Injection, Command Execution, Data Exfiltration, and Obfuscation.
-      2. **AI Analysis (LLM Rep)**: Deep semantic security analysis using the `Google Gemini` API to find hidden vulnerabilities with randomized delimiter protection.
-    - **Intuitive Report**: Displays scan results, severity, and errors inside an overlay dashboard directly.
-- **Global Monitoring Switch**: The dashboard syncs with the VS Code Status Bar, supporting a one-click toggle for monitoring states (ON / OFF).
+| Feature | Description |
+|---|---|
+| **Premium UI Dashboard** | Glassmorphism-style WebView panel with a clean skill list |
+| **Dynamic Glow Status Bar** | Status bar glows with neon highlights when a skill is `ACTIVE` |
+| **Real-Time Sync** | Watches `.agents/active_skill.json` and `.agents/skills/*` — no manual refresh needed |
+| **Single Click** | Opens the corresponding `SKILL.md` document instantly |
+| **Double Click** | Manually activates or deactivates a skill |
+| **Apply Command** | Copies the skill's slash command (e.g. `/pdf`) to clipboard — paste directly into any chat interface |
+| **Import Examples** | One-click import of built-in demo skills into `.agents/skills/` |
+| **Smart Security Scanner** | Dual-engine scan (RegExp heuristics + Gemini AI) against the Cisco AITech Threat Taxonomy |
+| **Global Monitor Toggle** | Dashboard syncs with the VS Code Status Bar for one-click ON/OFF |
+
+---
+
+## 🛡️ Security Scanner (Skill Scanner)
+
+Powered by [Cisco AI Defense Skill-Scanner](https://github.com/cisco-ai-defense/skill-scanner/) rules + Google Gemini, the scanner runs two parallel analysis engines:
+
+**1. Re Rep (RegExp Engine)** — Local, zero-latency heuristic analysis covering:
+- `AITech-1.1` — Direct Prompt Injection
+- `AITech-1.2` — Indirect Prompt Injection / Transitive Trust Abuse
+- `AITech-4.3` — Skill Discovery Abuse
+- `AITech-8.2` — Data Exfiltration & Hardcoded Secrets
+- `AITech-9.1` — Command Injection / Code Execution
+- `AITech-9.2` — Obfuscation Patterns
+- `AITech-12.1` — Unauthorized Tool Use
+
+**2. LLM Rep (AI Engine)** — A multi-agent pipeline built on `gemini-2.5-flash` that runs deep semantic analysis beyond what RegExp can catch.
+
+The pipeline has two stages:
+
+**Stage 1 — Parallel Analysis (4 specialized agents run concurrently):**
+
+| Agent | Threat Focus | AITech Rules |
+|---|---|---|
+| `PromptInjectionResearcher` | Instruction override, system prompt tampering, indirect injection via external content | 1.1, 1.2 |
+| `DataExfiltrationResearcher` | Unauthorized network calls (`curl`, `wget`), hardcoded secrets | 8.2 |
+| `CommandInjectionResearcher` | Destructive shell commands, code execution (`eval`, `os.system`), Base64 obfuscation | 9.1, 9.2 |
+| `ToolAbuseResearcher` | Capability inflation ("can do everything"), unauthorized tool invocation | 4.3, 12.1 |
+
+Each agent independently returns `[SAFE]` or `[VULNERABLE: <Severity>]` (LOW / MEDIUM / HIGH / CRITICAL).
+
+**Stage 2 — Synthesis Agent:**
+A dedicated `SynthesisAgent` reads all 4 parallel findings and produces a unified report. It escalates to the highest severity found and never adds knowledge beyond what the agents reported — reducing hallucinations.
+
+The final dashboard overlay shows:
+- Overall severity tag: `[CRITICAL]` / `[HIGH]` / `[MEDIUM]` / `[LOW]` / `[SAFE]`
+- A synthesized summary of all findings
+- Per-agent breakdown for full observability
+
+Results (severity, findings, errors) appear in an overlay panel inside the dashboard.
+
+---
 
 ## 🚀 Quick Start
 
-### 1. Installation & Development
-Download the latest `skill-monitor` vsix to install, or press `F5` in a source code development environment.
+### 1. Installation
 
-### 2. Workspace Setup
-In the root directory of your target project, ensure you have the following structure:
+**From Marketplace:**
+Search `Skill Monitor` in the VS Code Extensions panel, or install via:
+```
+ext install FANJIYU0825.skill-monitor
+```
+
+**From source (development):**
+Clone the repo and press `F5` to launch the Extension Development Host.
+
+### 2. Workspace Structure
+
+Create the following in your project root:
 ```text
 .agents/
-├── active_skill.json  # Stores currently active skills (Auto-generated/updated)
-└── skills/            # Folder holding all skill directories
+├── active_skill.json   # Active skills (auto-generated/updated)
+└── skills/
     ├── pdf/
     │   └── SKILL.md
     ├── skill-creator/
@@ -52,40 +97,38 @@ In the root directory of your target project, ensure you have the following stru
     └── ...
 ```
 
-### 3. Usage
-- Click the **⚡️ Lightning Bolt icon** in the Activity Bar to open the dashboard.
-- Observe the **$(zap) Skill** status bar (bottom right corner), which can also be clicked to toggle monitoring.
-- Double-click a skill, use "Apply" to copy commands, or try "Scan" to validate security right from the dashboard.
-
-## 🛠 Configuration
-Example of the `active_skill.json` format:
+`active_skill.json` format:
 ```json
 {
     "active_skills": ["pdf", "skill-creator"]
 }
 ```
 
-### 🧠 Setup Google Gemini API (Enable AI Scanning)
-1. Ensure you have a [Google Gemini API Key](https://aistudio.google.com/app/apikey).
-2. Press `Cmd + Shift + P` in VS Code to open the Command Palette.
-3. Search for and execute the command: `Test Google Generative AI`.
-4. Paste your Google API Key into the prompt.
-5. **Security Notice**: This key is securely stored in your local VS Code Global Settings (`skill-monitor.googleApiKey`). It is **exempt from cloud synchronization** (`ignoreSync: true`) and will NEVER be committed or tracked by Git with your project. Your key remains private.
-6. Once configured, click the "Scan" button in your dashboard to view dual scan results via `Re Rep` and `LLM Rep`!
+### 3. Using the Dashboard
+
+1. Click the **⚡️ Lightning Bolt** icon in the Activity Bar.
+2. The **`$(zap) Skill`** item in the status bar (bottom-right) also toggles monitoring on/off.
+3. From the dashboard: double-click to activate/deactivate, click **Apply** to copy slash commands, or click **Scan** to run a security check.
+
+---
+
+## 🧠 Enable AI Scanning (Google Gemini)
+
+1. Get a [Google Gemini API Key](https://aistudio.google.com/app/apikey).
+2. Open the Command Palette (`Cmd/Ctrl + Shift + P`).
+3. Run: **`Test Google Generative AI`**
+4. Paste your API key into the prompt.
+
+> **Security**: The key is stored in your local VS Code Global Settings (`skill-monitor.googleApiKey`) with `ignoreSync: true`. It is never committed to Git or synced to the cloud.
+
+---
 
 ## 📋 Changelog
 
-### v0.1.3
-- **Bug Fix**: Examples tab now loads correctly on first install without requiring an IDE reload.
-- **Improvement**: Added `onDidChangeVisibility` listener — the panel refreshes automatically whenever it becomes visible.
-- **Improvement**: Added `retainContextWhenHidden: true` to prevent webview from being destroyed when switching panels.
-- **Bug Fix**: Fixed missing `exampleSkills` in the response when no workspace is open.
+See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
-### v0.1.2
-- Removed `node_modules` from `.vscodeignore`, bumped version.
-
-### v0.1.1
-- Multi-agent architecture support.
+---
 
 ## 📜 License
-MIT License
+
+[MIT](LICENSE)
