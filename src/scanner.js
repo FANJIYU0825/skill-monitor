@@ -37,7 +37,7 @@ class SkillScanner {
      * @param {string} rootPath 
      * @returns {Promise<ScanResult>}
      */
-    async scan(skillName, rootPath) {
+    async scan(skillName, rootPath, mode = 'full') {
         const skillPath = path.join(rootPath, '.agents', 'skills', skillName);
         const skillMdPath = path.join(skillPath, 'SKILL.md');
 
@@ -69,9 +69,10 @@ class SkillScanner {
         result.scannedFiles = files.map(f => f.relativePath);
         result.fileSource = source;
 
-        // Build aggregated content for security scanning
+        // Read each file individually (for per-file RE scan attribution) and build aggregated content for LLM
         let totalBytes = 0;
-        const sections = [];
+        const fileContents = [];  // [{relativePath, content}] for RE scan
+        const sections = [];      // aggregated text sections for LLM scan
         for (const { absolutePath, relativePath } of files) {
             try {
                 const stat = fs.statSync(absolutePath);
@@ -84,6 +85,7 @@ class SkillScanner {
                     continue;
                 }
                 const content = fs.readFileSync(absolutePath, 'utf8');
+                fileContents.push({ relativePath, content });
                 sections.push(`=== File: ${relativePath} ===\n${content}\n`);
                 totalBytes += stat.size;
             } catch (e) {
@@ -104,12 +106,15 @@ class SkillScanner {
                 this._performStructuralScan(skillMdContent, tempRes);
                 resolve(tempRes.structural);
             }),
-            // RegExp scan runs on ALL collected files
+            // RegExp scan runs per-file to attribute findings to source file
             new Promise((resolve) => {
-                resolve(this._performRegExpScan(aggregatedContent));
+                resolve(this._performRegExpScan(fileContents));
             }),
-            // AI scan runs on ALL collected files
+            // AI scan runs on ALL collected files (skipped in re-only mode)
             (async () => {
+                if (mode === 're-only') {
+                    return { text: '[AI Scan skipped — RE-only mode]', severity: 'NONE' };
+                }
                 if (apiKey && aggregatedContent) {
                     try {
                         return await this._performAIScan(apiKey, aggregatedContent, skillName);
@@ -215,58 +220,68 @@ class SkillScanner {
 
 
     /**
+     * @param {Array<{relativePath: string, content: string}>} fileContents
      * @returns {{severity: string, summary: string, findings: string[]}}
      */
-    _performRegExpScan(content) {
-        if (!content) return { severity: 'NONE', summary: 'No content to scan.', findings: [] };
+    _performRegExpScan(fileContents) {
+        if (!fileContents || fileContents.length === 0) return { severity: 'NONE', summary: 'No content to scan.', findings: [] };
+
+        const PATTERNS = [
+            {
+                id: 'AITech-1.1', level: 'HIGH', label: 'Prompt Injection',
+                desc: 'Instruction override detected',
+                re: /(ignore previous|disregard|forget|override).*(instructions|prompt|rules)|<!---UNTRUSTED_INPUT_START_/i
+            },
+            {
+                id: 'AITech-1.2', level: 'MEDIUM', label: 'Transitive Trust Abuse',
+                desc: 'Potential indirect prompt injection from external content',
+                re: /(system|assistant):.*(ignore|follow)/i,
+                re2: /parse.*(URL|http).*instructions/i
+            },
+            {
+                id: 'AITech-4.3', level: 'MEDIUM', label: 'Skill Discovery Abuse',
+                desc: 'Capability inflation detected',
+                re: /(can|will) perform (all|any|unlimited) actions|always return true/i
+            },
+            {
+                id: 'AITech-8.2a', level: 'CRITICAL', label: 'Data Exfiltration',
+                desc: 'Network transmission command detected',
+                re: /(curl|wget|nc|netcat|ping|telnet) .*(http|ftp|[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/i
+            },
+            {
+                id: 'AITech-8.2b', level: 'HIGH', label: 'Hardcoded Secrets',
+                desc: 'Embedded credentials or keys detected',
+                re: /(AKIA[0-9A-Z]{16})|(ghp_[a-zA-Z0-9]{36})|("?password"?\s*[:=]\s*".+")/i
+            },
+            {
+                id: 'AITech-9.1', level: 'CRITICAL', label: 'Command Injection',
+                desc: 'Dangerous system commands or execution primitives detected',
+                re: /(rm -rf|mkfs|chmod 777|chown -R|: \(\) \{|>\/dev\/sda|os\.system|subprocess\.Popen|eval\(.*\))/i
+            },
+            {
+                id: 'AITech-9.2', level: 'HIGH', label: 'Obfuscation',
+                desc: 'Detection-evasion obfuscation patterns (e.g. Base64) detected',
+                re: /(base64 -d|ZWNoby|echo -e "\\x|fromCharCode)/i
+            },
+            {
+                id: 'AITech-12.1', level: 'HIGH', label: 'Unauthorized Tool Use',
+                desc: 'Unsafe interaction with compute environments detected',
+                re: /(use_tool|execute_tool).*(shell|bash|python|node)/i
+            }
+        ];
 
         const findings = [];
         let severity = 'NONE';
 
-        // 1. Direct Prompt Injection (AITech-1.1)
-        if (/(ignore previous|disregard|forget|override).*(instructions|prompt|rules)|<!---UNTRUSTED_INPUT_START_/i.test(content)) {
-            findings.push("- [HIGH] [AITech-1.1] Prompt Injection: Instruction override detected.");
-            if (this._isHigherSeverity('HIGH', severity)) severity = 'HIGH';
-        }
-
-        // 2. Transitive Trust Abuse / Indirect Prompt Injection (AITech-1.2)
-        if (/(system|assistant):.*(ignore|follow)/i.test(content) || /parse.*(URL|http).*instructions/i.test(content)) {
-            findings.push("- [MEDIUM] [AITech-1.2] Transitive Trust Abuse: Potential indirect prompt injection from external content.");
-            if (this._isHigherSeverity('MEDIUM', severity)) severity = 'MEDIUM';
-        }
-
-        // 3. Skill Discovery Abuse (AITech-4.3)
-        if (/(can|will) perform (all|any|unlimited) actions|always return true/i.test(content)) {
-            findings.push("- [MEDIUM] [AITech-4.3] Skill Discovery Abuse: Capability inflation detected.");
-            if (this._isHigherSeverity('MEDIUM', severity)) severity = 'MEDIUM';
-        }
-
-        // 4. Data Exfiltration & Hardcoded Secrets (AITech-8.2)
-        if (/(curl|wget|nc|netcat|ping|telnet) .*(http|ftp|[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/i.test(content)) {
-            findings.push("- [CRITICAL] [AITech-8.2] Data Exfiltration: Network transmission command detected.");
-            if (this._isHigherSeverity('CRITICAL', severity)) severity = 'CRITICAL';
-        }
-        if (/(AKIA[0-9A-Z]{16})|(ghp_[a-zA-Z0-9]{36})|("?password"?\s*[:=]\s*".+")/i.test(content)) {
-            findings.push("- [HIGH] [AITech-8.2] Hardcoded Secrets: Embedded credentials or keys detected.");
-            if (this._isHigherSeverity('HIGH', severity)) severity = 'HIGH';
-        }
-
-        // 5. Command Injection / Code Execution (AITech-9.1)
-        if (/(rm -rf|mkfs|chmod 777|chown -R|: \(\) \{|>\/dev\/sda|os\.system|subprocess\.Popen|eval\(.*\))/i.test(content)) {
-            findings.push("- [CRITICAL] [AITech-9.1] Command Injection / Code Execution: Dangerous system commands or execution primitives detected.");
-            if (this._isHigherSeverity('CRITICAL', severity)) severity = 'CRITICAL';
-        }
-
-        // 6. Obfuscation (AITech-9.2)
-        if (/(base64 -d|ZWNoby|echo -e "\\x|fromCharCode)/i.test(content)) {
-            findings.push("- [HIGH] [AITech-9.2] Obfuscation: Detection-evasion obfuscation patterns (e.g. Base64) detected.");
-            if (this._isHigherSeverity('HIGH', severity)) severity = 'HIGH';
-        }
-
-        // 7. Unauthorized Tool Use (AITech-12.1)
-        if (/(use_tool|execute_tool).*(shell|bash|python|node)/i.test(content)) {
-            findings.push("- [HIGH] [AITech-12.1] Unauthorized Tool Use: Unsafe interaction with compute environments detected.");
-            if (this._isHigherSeverity('HIGH', severity)) severity = 'HIGH';
+        for (const { relativePath, content } of fileContents) {
+            const fileName = relativePath.split('/').pop();
+            for (const pattern of PATTERNS) {
+                const hit = pattern.re.test(content) || (pattern.re2 && pattern.re2.test(content));
+                if (hit) {
+                    findings.push(`- [${pattern.level}] [${pattern.id}] ${pattern.label}: ${pattern.desc}  →  ${fileName}`);
+                    if (this._isHigherSeverity(pattern.level, severity)) severity = pattern.level;
+                }
+            }
         }
 
         const summary = findings.length === 0
@@ -335,14 +350,29 @@ class SkillScanner {
         const files = [];
 
         try {
-            const output = execSync(`git ls-files "${skillPath}"`, {
+            // Collect both tracked files and untracked (but not ignored) files
+            const trackedOutput = execSync(`git ls-files "${skillPath}"`, {
                 cwd: rootPath,
                 encoding: 'utf8',
                 timeout: 5000
             }).trim();
 
-            if (output) {
-                for (const relPath of output.split('\n').filter(f => f.trim())) {
+            const untrackedOutput = execSync(`git ls-files --others --exclude-standard "${skillPath}"`, {
+                cwd: rootPath,
+                encoding: 'utf8',
+                timeout: 5000
+            }).trim();
+
+            const allLines = [
+                ...trackedOutput.split('\n'),
+                ...untrackedOutput.split('\n')
+            ].filter(f => f.trim());
+
+            if (allLines.length > 0) {
+                const seen = new Set();
+                for (const relPath of allLines) {
+                    if (seen.has(relPath)) continue;
+                    seen.add(relPath);
                     const ext = path.extname(relPath).toLowerCase();
                     if (!BINARY_EXTENSIONS.has(ext)) {
                         files.push({

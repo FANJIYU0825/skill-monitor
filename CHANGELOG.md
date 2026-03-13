@@ -2,6 +2,14 @@
 
 All notable changes to the Skill Monitor extension will be documented in this file.
 
+## [0.1.5] - 2026-03-13
+### Added
+- **RE Scan button**: Split the single "Scan" button into **RE Scan** (RegExp-only, instant, no API key required) and **Full Scan** (RegExp + Gemini AI). Allows fast local validation without waiting for LLM round-trips.
+- **Per-file finding attribution**: RE scan findings now report the exact source filename (e.g. `→ deploy.md`) so users know which file triggered each security alert.
+
+### Fixed
+- **Git-aware full-skill scanning**: `_collectSkillFiles` previously used `git ls-files` only, which silently skipped untracked files. It now also runs `git ls-files --others --exclude-standard` to include files that exist in the skill directory but have not yet been committed or staged.
+
 ## [0.1.4]
 ### Changed
 - **Publisher renamed** from `fanfan` to `FANJIYU0825` to match GitHub account for Open VSX namespace verification.
