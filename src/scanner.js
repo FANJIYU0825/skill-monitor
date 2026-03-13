@@ -1,8 +1,21 @@
 const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 const { GoogleGenAI } = require('@google/genai');
 const { buildMultiAgentScanner } = require('./llm-prompt');
+
+const BINARY_EXTENSIONS = new Set([
+    '.pdf', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp',
+    '.zip', '.tar', '.gz', '.rar', '.7z',
+    '.exe', '.bin', '.dll', '.so', '.dylib',
+    '.woff', '.woff2', '.ttf', '.eot',
+    '.mp3', '.mp4', '.wav', '.avi', '.mov',
+    '.pyc', '.class', '.o'
+]);
+
+const MAX_FILE_BYTES = 512 * 1024;   // 512 KB per file
+const MAX_TOTAL_BYTES = 2 * 1024 * 1024; // 2 MB total
 
 /**
  * Skill Scanner results structure
@@ -49,7 +62,35 @@ class SkillScanner {
             return result;
         }
 
-        const skillContent = fs.readFileSync(skillMdPath, 'utf8');
+        const skillMdContent = fs.readFileSync(skillMdPath, 'utf8');
+
+        // Collect all text files in the skill directory (git-aware)
+        const { files, source } = this._collectSkillFiles(skillPath, rootPath);
+        result.scannedFiles = files.map(f => f.relativePath);
+        result.fileSource = source;
+
+        // Build aggregated content for security scanning
+        let totalBytes = 0;
+        const sections = [];
+        for (const { absolutePath, relativePath } of files) {
+            try {
+                const stat = fs.statSync(absolutePath);
+                if (stat.size > MAX_FILE_BYTES) {
+                    sections.push(`=== File: ${relativePath} ===\n[Skipped: file too large (${Math.round(stat.size / 1024)} KB)]\n`);
+                    continue;
+                }
+                if (totalBytes + stat.size > MAX_TOTAL_BYTES) {
+                    sections.push(`=== File: ${relativePath} ===\n[Skipped: total scan size limit reached]\n`);
+                    continue;
+                }
+                const content = fs.readFileSync(absolutePath, 'utf8');
+                sections.push(`=== File: ${relativePath} ===\n${content}\n`);
+                totalBytes += stat.size;
+            } catch (e) {
+                sections.push(`=== File: ${relativePath} ===\n[Error reading file: ${e.message}]\n`);
+            }
+        }
+        const aggregatedContent = sections.join('\n');
 
         // Prepare config for LLM Scan
         const config = vscode.workspace.getConfiguration('skill-monitor');
@@ -57,21 +98,21 @@ class SkillScanner {
 
         // Dispatch all scans concurrently
         const [structuralResult, reRepResult, scanOutput] = await Promise.all([
-            // Structural is synchronous but wrapped for standard interface
+            // Structural scan runs only on SKILL.md (YAML frontmatter validation)
             new Promise((resolve) => {
                 const tempRes = { structural: { valid: true, errors: [] } };
-                this._performStructuralScan(skillContent, tempRes);
+                this._performStructuralScan(skillMdContent, tempRes);
                 resolve(tempRes.structural);
             }),
-            // RegExp is synchronous but wrapped
+            // RegExp scan runs on ALL collected files
             new Promise((resolve) => {
-                resolve(this._performRegExpScan(skillContent));
+                resolve(this._performRegExpScan(aggregatedContent));
             }),
-            // AI scan is asynchronous natively
+            // AI scan runs on ALL collected files
             (async () => {
-                if (apiKey && skillContent) {
+                if (apiKey && aggregatedContent) {
                     try {
-                        return await this._performAIScan(apiKey, skillContent, skillName);
+                        return await this._performAIScan(apiKey, aggregatedContent, skillName);
                     } catch (err) {
                         console.error('LLM Scan Error:', err);
                         return { text: `[Error calling Google API] ${err.message}`, severity: 'NONE' };
@@ -88,7 +129,8 @@ class SkillScanner {
         const llmRepText = scanOutput.text;
         const llmSeverity = scanOutput.severity;
 
-        result.security.summary = `=== Re Rep ===\n${reRepResult.summary}\n\n=== LLM Rep ===\n${llmRepText}`;
+        const fileSourceLabel = source === 'git' ? 'git ls-files' : 'filesystem (git unavailable)';
+        result.security.summary = `=== Scanned ${files.length} file(s) via ${fileSourceLabel} ===\n\n=== Re Rep ===\n${reRepResult.summary}\n\n=== LLM Rep ===\n${llmRepText}`;
 
         // Determine final highest severity across Structural, RegExp, and LLM
         let highestSeverity = result.severity;
@@ -280,6 +322,73 @@ class SkillScanner {
             text: `${rawReport}\n\n${details}`,
             severity: highestSeverity
         };
+    }
+
+    /**
+     * Collects all scannable text files in the skill directory.
+     * Prefers git ls-files to respect .gitignore; falls back to recursive fs walk.
+     * @param {string} skillPath - Absolute path to the skill directory
+     * @param {string} rootPath  - Workspace root (git repo root)
+     * @returns {{ files: Array<{absolutePath: string, relativePath: string}>, source: 'git'|'fs' }}
+     */
+    _collectSkillFiles(skillPath, rootPath) {
+        const files = [];
+
+        try {
+            const output = execSync(`git ls-files "${skillPath}"`, {
+                cwd: rootPath,
+                encoding: 'utf8',
+                timeout: 5000
+            }).trim();
+
+            if (output) {
+                for (const relPath of output.split('\n').filter(f => f.trim())) {
+                    const ext = path.extname(relPath).toLowerCase();
+                    if (!BINARY_EXTENSIONS.has(ext)) {
+                        files.push({
+                            absolutePath: path.join(rootPath, relPath),
+                            relativePath: relPath
+                        });
+                    }
+                }
+                return { files, source: 'git' };
+            }
+        } catch (_) {
+            // git unavailable or not a git repo — fall through to fs walk
+        }
+
+        // Fallback: recursive filesystem walk
+        this._walkDir(skillPath, skillPath, files);
+        return { files, source: 'fs' };
+    }
+
+    /**
+     * Recursively walks a directory and collects non-binary files.
+     * @param {string} dir
+     * @param {string} baseDir - Used to compute relative paths
+     * @param {Array} result
+     */
+    _walkDir(dir, baseDir, result) {
+        let entries;
+        try {
+            entries = fs.readdirSync(dir, { withFileTypes: true });
+        } catch (_) {
+            return;
+        }
+        for (const entry of entries) {
+            const fullPath = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                this._walkDir(fullPath, baseDir, result);
+            } else if (entry.isFile()) {
+                const ext = path.extname(entry.name).toLowerCase();
+                if (!BINARY_EXTENSIONS.has(ext)) {
+                    result.push({
+                        absolutePath: fullPath,
+                        relativePath: path.relative(baseDir, fullPath)
+                    });
+                }
+            }
+        }
     }
 
     _isHigherSeverity(newSev, currentSev) {
