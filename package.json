@@ -2,7 +2,7 @@
     "name": "skill-monitor",
     "displayName": "Skill Monitor",
     "description": "Monitor and manage AI Agent Skills in the .agents/skills directory",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "engines": {
         "vscode": "^1.90.0"
     },
@@ -46,8 +46,13 @@
             },
             {
                 "command": "skill-monitor.scanSkill",
-                "title": "Scan Skill",
+                "title": "Full Scan Skill (AI + RE)",
                 "icon": "$(shield)"
+            },
+            {
+                "command": "skill-monitor.reScanSkill",
+                "title": "RE Scan Skill (RegExp only)",
+                "icon": "$(search)"
             },
             {
                 "command": "skill-monitor.importExamples",

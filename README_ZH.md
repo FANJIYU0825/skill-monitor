@@ -2,7 +2,7 @@
 
 🌍 [English](README.md) | **繁體中文**
 
-[![Version](https://img.shields.io/badge/Version-0.1.4-blue.svg?style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=FANJIYU0825.skill-monitor)
+[![Version](https://img.shields.io/badge/Version-0.1.5-blue.svg?style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=FANJIYU0825.skill-monitor)
 [![GitHub stars](https://img.shields.io/github/stars/FANJIYU0825/skill-monitor?style=for-the-badge&color=ffd700)](https://github.com/FANJIYU0825/skill-monitor/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/FANJIYU0825/skill-monitor?style=for-the-badge&color=red)](https://github.com/FANJIYU0825/skill-monitor/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -25,14 +25,17 @@
 | **雙擊** | 手動啟動或關閉技能 |
 | **Apply 指令** | 自動複製技能的 Slash Command（如 `/pdf`）到剪貼簿，可直接貼到任何聊天介面使用 |
 | **Import Examples** | 一鍵將內建範例技能匯入 `.agents/skills/` 目錄 |
-| **智能安全掃描** | 雙引擎掃描（RegExp 啟發式 + Gemini AI），對應 Cisco AITech 威脅分類框架 |
+| **RE Scan** | 即時本地 RegExp 掃描，無需 API Key。每個發現會標示觸發的來源檔名。 |
+| **Full Scan** | 完整雙引擎掃描（RegExp + Gemini AI），對應 Cisco AITech 威脅分類框架 |
 | **全局監控開關** | 儀表板與 VS Code 狀態欄同步，一鍵切換 ON/OFF |
 
 ---
 
 ## 🛡️ 安全掃描器 (Skill Scanner)
 
-整合 [Cisco AI Defense Skill-Scanner](https://github.com/cisco-ai-defense/skill-scanner/) 規則與 Google Gemini，掃描器執行兩個並行分析引擎：
+整合 [Cisco AI Defense Skill-Scanner](https://github.com/cisco-ai-defense/skill-scanner/) 規則與 Google Gemini，掃描器提供兩種獨立掃描模式：
+
+> **Git 感知檔案收集**：掃描器同時使用 `git ls-files` 與 `git ls-files --others --exclude-standard` 收集技能目錄中所有已追蹤與未追蹤（未 ignore）的檔案，確保即使尚未 commit 的新檔案也能被掃描到。
 
 **1. Re Rep（正則表示法引擎）** — 本地、零延遲的啟發式分析，涵蓋：
 - `AITech-1.1` — 直接 Prompt 注入
@@ -42,6 +45,8 @@
 - `AITech-9.1` — 指令注入 / 程式碼執行
 - `AITech-9.2` — 混淆模式
 - `AITech-12.1` — 未授權工具使用
+
+每個發現會標示**來源檔名**（例如 `→ deploy.md`），讓你一眼知道問題在哪個檔案。
 
 **2. LLM Rep（AI 引擎）** — 基於 `gemini-2.5-flash` 的多代理人 Pipeline，執行超越 RegExp 能力範疇的深度語意分析。
 
@@ -106,7 +111,7 @@ Clone 此 repo 後按 `F5` 啟動 Extension Development Host。
 
 1. 點擊活動欄（Activity Bar）中的 **⚡️ 閃電圖示** 開啟儀表板。
 2. 狀態欄右下角的 **`$(zap) Skill`** 也可點擊切換監控開關。
-3. 在儀表板中：雙擊可啟動/停用技能，點擊 **Apply** 複製 Slash Command，點擊 **Scan** 執行安全掃描。
+3. 在儀表板中：雙擊可啟動/停用技能，點擊 **Apply** 複製 Slash Command，點擊 **RE Scan** 執行快速本地掃描，或點擊 **Full Scan** 執行完整 AI 分析。
 
 ---
 

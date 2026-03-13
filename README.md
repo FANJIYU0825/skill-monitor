@@ -2,7 +2,7 @@
 
 🌍 **English** | [繁體中文](README_ZH.md)
 
-[![Version](https://img.shields.io/badge/Version-0.1.4-blue.svg?style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=FANJIYU0825.skill-monitor)
+[![Version](https://img.shields.io/badge/Version-0.1.5-blue.svg?style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=FANJIYU0825.skill-monitor)
 [![GitHub stars](https://img.shields.io/github/stars/FANJIYU0825/skill-monitor?style=for-the-badge&color=ffd700)](https://github.com/FANJIYU0825/skill-monitor/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/FANJIYU0825/skill-monitor?style=for-the-badge&color=red)](https://github.com/FANJIYU0825/skill-monitor/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -25,14 +25,17 @@ An advanced skill monitoring dashboard for AI Agent developers. Track active ski
 | **Double Click** | Manually activates or deactivates a skill |
 | **Apply Command** | Copies the skill's slash command (e.g. `/pdf`) to clipboard — paste directly into any chat interface |
 | **Import Examples** | One-click import of built-in demo skills into `.agents/skills/` |
-| **Smart Security Scanner** | Dual-engine scan (RegExp heuristics + Gemini AI) against the Cisco AITech Threat Taxonomy |
+| **RE Scan** | Instant local RegExp scan — no API key needed. Results include the exact source filename for every finding. |
+| **Full Scan** | Full dual-engine scan (RegExp + Gemini AI) against the Cisco AITech Threat Taxonomy |
 | **Global Monitor Toggle** | Dashboard syncs with the VS Code Status Bar for one-click ON/OFF |
 
 ---
 
 ## 🛡️ Security Scanner (Skill Scanner)
 
-Powered by [Cisco AI Defense Skill-Scanner](https://github.com/cisco-ai-defense/skill-scanner/) rules + Google Gemini, the scanner runs two parallel analysis engines:
+Powered by [Cisco AI Defense Skill-Scanner](https://github.com/cisco-ai-defense/skill-scanner/) rules + Google Gemini, the scanner provides two independent scan modes:
+
+> **Git-aware file collection**: The scanner automatically collects all files in the skill directory — both git-tracked files and untracked (non-ignored) files — using `git ls-files` + `git ls-files --others --exclude-standard`. This ensures newly created files are scanned even before they are committed.
 
 **1. Re Rep (RegExp Engine)** — Local, zero-latency heuristic analysis covering:
 - `AITech-1.1` — Direct Prompt Injection
@@ -42,6 +45,8 @@ Powered by [Cisco AI Defense Skill-Scanner](https://github.com/cisco-ai-defense/
 - `AITech-9.1` — Command Injection / Code Execution
 - `AITech-9.2` — Obfuscation Patterns
 - `AITech-12.1` — Unauthorized Tool Use
+
+Each finding is attributed to its **source file** (e.g. `→ deploy.md`), so you know exactly where to look.
 
 **2. LLM Rep (AI Engine)** — A multi-agent pipeline built on `gemini-2.5-flash` that runs deep semantic analysis beyond what RegExp can catch.
 
@@ -108,7 +113,7 @@ Create the following in your project root:
 
 1. Click the **⚡️ Lightning Bolt** icon in the Activity Bar.
 2. The **`$(zap) Skill`** item in the status bar (bottom-right) also toggles monitoring on/off.
-3. From the dashboard: double-click to activate/deactivate, click **Apply** to copy slash commands, or click **Scan** to run a security check.
+3. From the dashboard: double-click to activate/deactivate, click **Apply** to copy slash commands, click **RE Scan** for a fast local security check, or **Full Scan** for a full AI-powered analysis.
 
 ---
 

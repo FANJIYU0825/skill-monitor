@@ -38,16 +38,16 @@ function activate(context) {
     );
 
     // Toggle command
-    vscode.commands.registerCommand('skill-monitor.toggle', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('skill-monitor.toggle', () => {
         isMonitoring = !isMonitoring;
         vscode.window.showInformationMessage(`Skill Monitor is now ${isMonitoring ? 'ON' : 'OFF'}`);
         updateStatusBarItem();
         provider.updateState();
         vscode.commands.executeCommand('setContext', 'skill-monitor:isMonitoring', isMonitoring);
-    });
+    }));
 
     // Interaction: Open Skill Documentation
-    vscode.commands.registerCommand('skill-monitor.openSkill', (skillName) => {
+    context.subscriptions.push(vscode.commands.registerCommand('skill-monitor.openSkill', (skillName) => {
         const workspaceFolders = vscode.workspace.workspaceFolders;
         if (!workspaceFolders || workspaceFolders.length === 0) return;
 
@@ -61,10 +61,10 @@ function activate(context) {
         } else {
             vscode.window.showErrorMessage(`No SKILL.md found for ${skillName}`);
         }
-    });
+    }));
 
     // Interaction: Scan Skill using Unified SkillScanner
-    vscode.commands.registerCommand('skill-monitor.scanSkill', async (skillName) => {
+    context.subscriptions.push(vscode.commands.registerCommand('skill-monitor.scanSkill', async (skillName) => {
         const workspaceFolders = vscode.workspace.workspaceFolders;
         if (!workspaceFolders || workspaceFolders.length === 0) {
             vscode.window.showErrorMessage('No active workspace folder.');
@@ -109,10 +109,48 @@ function activate(context) {
                 vscode.window.showErrorMessage(`Skill scan failed: ${err.message}`);
             }
         });
-    });
+    }));
+
+    // Interaction: RE-only Scan (no AI)
+    context.subscriptions.push(vscode.commands.registerCommand('skill-monitor.reScanSkill', async (skillName) => {
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        if (!workspaceFolders || workspaceFolders.length === 0) {
+            vscode.window.showErrorMessage('No active workspace folder.');
+            return;
+        }
+
+        const rootPath = workspaceFolders[0].uri.fsPath;
+
+        vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `🔍 RE Scan: ${skillName}...`,
+            cancellable: false
+        }, async () => {
+            scannerOutputChannel.appendLine(`\n========== RE Scan: ${skillName} ==========`);
+            scannerOutputChannel.show(true);
+
+            try {
+                const scanResult = await scanner.scan(skillName, rootPath, 're-only');
+
+                scannerOutputChannel.appendLine(`Severity: ${scanResult.severity}`);
+                if (!scanResult.structural.valid) {
+                    scannerOutputChannel.appendLine(`Structural Errors: ${scanResult.structural.errors.join(', ')}`);
+                }
+                scannerOutputChannel.appendLine(`\n--- RE Scan Summary ---\n${scanResult.security.summary}`);
+                scannerOutputChannel.appendLine('\n[RE Scan Finished]');
+
+                provider.postMessage({ type: 'scanResult', scanResult });
+
+                vscode.window.showInformationMessage(`RE Scan complete for ${skillName}. Severity: ${scanResult.severity}`);
+            } catch (err) {
+                scannerOutputChannel.appendLine(`\n[RE Scan Failed] Error: ${err.message}`);
+                vscode.window.showErrorMessage(`RE Scan failed: ${err.message}`);
+            }
+        });
+    }));
 
     // Interaction: Import Example Skills
-    vscode.commands.registerCommand('skill-monitor.importExamples', async (skillName) => {
+    context.subscriptions.push(vscode.commands.registerCommand('skill-monitor.importExamples', async (skillName) => {
         if (!skillName || typeof skillName !== 'string') return;
         const workspaceFolders = vscode.workspace.workspaceFolders;
         if (!workspaceFolders || workspaceFolders.length === 0) {
@@ -138,10 +176,10 @@ function activate(context) {
             console.error(`Failed to import example skill '${skillName}':`, err);
             vscode.window.showErrorMessage(`Failed to import example skill '${skillName}': ${err.message}`);
         }
-    });
+    }));
 
     // Interaction: Preview Example Skill
-    vscode.commands.registerCommand('skill-monitor.previewExampleSkill', async (skillName) => {
+    context.subscriptions.push(vscode.commands.registerCommand('skill-monitor.previewExampleSkill', async (skillName) => {
         if (!skillName || typeof skillName !== 'string') return;
         const skillPath = path.join(context.extensionPath, 'sample-skills', skillName, 'SKILL.md');
         if (fs.existsSync(skillPath)) {
@@ -150,10 +188,10 @@ function activate(context) {
         } else {
             vscode.window.showErrorMessage(`SKILL.md not found for example skill '${skillName}'.`);
         }
-    });
+    }));
 
     // Interaction: Test Google Generative AI
-    vscode.commands.registerCommand('skill-monitor.testGoogleAI', async () => {
+    context.subscriptions.push(vscode.commands.registerCommand('skill-monitor.testGoogleAI', async () => {
         // Read the API key from VS Code settings (we will ask user to set it if empty)
         const config = vscode.workspace.getConfiguration('skill-monitor');
         let apiKey = config.get('googleApiKey');
@@ -204,7 +242,7 @@ function activate(context) {
                 }
             }
         });
-    });
+    }));
 
     // File Watchers
     const workspaceFolders = vscode.workspace.workspaceFolders;
