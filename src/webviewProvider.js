@@ -30,6 +30,9 @@ class SkillMonitorWebviewProvider {
                 case 'openSkill':
                     vscode.commands.executeCommand('skill-monitor.openSkill', data.skillName);
                     break;
+                case 'openSkillViewer':
+                    vscode.commands.executeCommand('skill-monitor.openSkillViewer', data.skillName);
+                    break;
                 case 'toggleSkill':
                     this._toggleSkillActivation(data.skillName);
                     break;
