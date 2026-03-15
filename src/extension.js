@@ -4,6 +4,7 @@ const path = require('path');
 const { GoogleGenAI } = require('@google/genai');
 const { SkillScanner } = require('./scanner');
 const { SkillMonitorWebviewProvider } = require('./webviewProvider');
+const { openSkillViewer } = require('./skillViewer');
 
 /** @type {vscode.OutputChannel} */
 let scannerOutputChannel;
@@ -46,7 +47,7 @@ function activate(context) {
         vscode.commands.executeCommand('setContext', 'skill-monitor:isMonitoring', isMonitoring);
     }));
 
-    // Interaction: Open Skill Documentation
+    // Interaction: Open Skill Documentation (single-click)
     context.subscriptions.push(vscode.commands.registerCommand('skill-monitor.openSkill', (skillName) => {
         const workspaceFolders = vscode.workspace.workspaceFolders;
         if (!workspaceFolders || workspaceFolders.length === 0) return;
@@ -61,6 +62,22 @@ function activate(context) {
         } else {
             vscode.window.showErrorMessage(`No SKILL.md found for ${skillName}`);
         }
+    }));
+
+    // Interaction: Open Skill Dual-Mode Viewer (double-click)
+    context.subscriptions.push(vscode.commands.registerCommand('skill-monitor.openSkillViewer', (skillName) => {
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        if (!workspaceFolders || workspaceFolders.length === 0) return;
+
+        const rootPath = workspaceFolders[0].uri.fsPath;
+        const skillMdPath = path.join(rootPath, '.agents', 'skills', skillName, 'SKILL.md');
+
+        if (!fs.existsSync(skillMdPath)) {
+            vscode.window.showErrorMessage(`No SKILL.md found for ${skillName}`);
+            return;
+        }
+
+        openSkillViewer(context, skillName, skillMdPath);
     }));
 
     // Interaction: Scan Skill using Unified SkillScanner

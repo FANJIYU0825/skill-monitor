@@ -344,7 +344,7 @@
                 };
                 card.ondblclick = () => {
                     if (timer) clearTimeout(timer);
-                    vscode.postMessage({ type: 'toggleSkill', skillName: skill });
+                    vscode.postMessage({ type: 'openSkillViewer', skillName: skill });
                 };
 
                 card.innerHTML = `
